@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/Xerrex/hello_books_api.svg?branch=master)](https://travis-ci.org/Xerrex/hello_books_api)
 
 ## Introduction
-This is a Flask API for Hello-Books application application. Hello-Books
+This is a Flask API for Hello-Books application. Hello-Books
 helps manage a library and its processes like stocking, tracking and renting books.
 
 ## Technologies used

@@ -1,7 +1,7 @@
 # Hello_books_api
 
 ![license](https://img.shields.io/github/license/mashape/apistatus.svg)
-![Build Status](https://travis-ci.org/Xerrex/hello_books_api.svg?branch=master)
+[![Build Status](https://travis-ci.org/Xerrex/hello_books_api.svg?branch=master)](https://travis-ci.org/Xerrex/hello_books_api)
 
 ## Introduction
 This is a Flask API for Hello-Books application application. Hello-Books

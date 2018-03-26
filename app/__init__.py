@@ -12,10 +12,10 @@ def create_app(config_env_name):
     api = Api(app)
 
     #import Resources
-    from app.views import Book
+    from app.views import BookResource
 
 
     #register endpoint
-    api.add_resource(Book, '/api/books')
+    api.add_resource(BookResource, '/api/books')
 
     return app

@@ -22,6 +22,7 @@ class Testing_env(Config):
     Testing enviroment configurations
     """
     DEBUG = True
+    TESTING = True
 
 
 class Production_env(Config):

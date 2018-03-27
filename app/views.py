@@ -3,13 +3,8 @@ from flask_restful import Resource, reqparse, abort
 from app.models import Book
 
 
-BOOKS2={}
+BOOKS={}
 
-BOOKS = {
-    'book1': {'name': 'welcome to flask'},
-    'book2': {'name': 'Welcome to flask API DIY'},
-    'book3': {'name': 'Welcome to flask flask-restful'},
-}
 
 class BookResource(Resource):
 

@@ -3,9 +3,9 @@ from flask_restful import Resource, reqparse, abort
 from app.models import Book
 
 
-BOOKS={}
+BOOKS2={}
 
-BOOKS2 = {
+BOOKS = {
     'book1': {'name': 'welcome to flask'},
     'book2': {'name': 'Welcome to flask API DIY'},
     'book3': {'name': 'Welcome to flask flask-restful'},
@@ -58,6 +58,12 @@ class BookResource(Resource):
         self.abort_if_book_does_not_esist(bookId)
         return BOOKS[bookId]
 
+    def delete(self,bookId):
+        self.abort_if_book_does_not_esist(bookId)
+        del BOOKS[bookId]
+
+        response = {'message':"Book:%s was deleted" % bookId,}
+        return response, 204
 
 class BookListResource(Resource):
 

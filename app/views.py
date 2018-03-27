@@ -8,47 +8,42 @@ BOOKS = {
     'book3': {'name': 'Welcome to flask flask-restful'},
 }
 
-books_list=[]
 
-
-class BookResource(Resource):
-
-
+class BookListResource(Resource):
 
     def __init__(self):
-        self.reqparse = reqparse.RequestParser()
+        super().__init__()
 
-        self.reqparse.add_argument('name', type=str, required=True,
-                                   help='Book name cannot be blank', location='json')
+        self.book_parser = reqparse.RequestParser()
 
-        self.reqparse.add_argument('description', type=str, required=True,
-                                   help='Book description cannot be blank', location='json')
+        self.book_parser.add_argument('name', type=str, required=True,
+                                      help='Book name cannot be blank', location='json')
 
-        self.reqparse.add_argument('section', type=str, required=True,
-                                   help='Please select Book section, empty be blank', location='json')
+        self.book_parser.add_argument('description', type=str, required=True,
+                                      help='Book description cannot be blank', location='json')
 
-        self.reqparse.add_argument('quantity', type=int, required=True,
-                                   help='Book quantity is a Number cannot be blank ', location='json')
+        self.book_parser.add_argument('section', type=str, required=True,
+                                      help='Please select Book section, empty be blank', location='json')
 
-        super(BookResource, self).__init__()
+        self.book_parser.add_argument('quantity', type=int, required=True,
+                                      help='Book quantity is a Number cannot be blank ', location='json')
 
     def get(self):
         return BOOKS
 
     def post(self):
-        args = self.reqparse.parse_args()
-        name = args['name']
-        description = args['description']
-        section = args['section']
-        quantity = args['quantity']
+        self.book_args = self.book_parser.parse_args()
+
+        book_name = self.book_args['name']
+        book_desc = self.book_args['description']
+        book_section = self.book_args['section']
+        book_qty = self.book_args['quantity']
 
 
-        #check if book exists in list
+        book_id = int(max(BOOKS.keys()).lstrip('book')) + 1
+        book_id = 'book%i' % book_id
 
-        for book in books_list:
-            if book.name == name:
-                return {'message': 'A Book with that name already exists'}, 409
-            else:
-                new_book = Book(name=name, description=description, section=section, quantity=quantity)
-                books_list.append(new_book)
-                return {'message': 'Book name: %s has been succesfully created' % new_book.name}, 200
+        new_book = Book(book_name, book_desc, book_section, book_qty)
+        BOOKS[book_id] = new_book.__dict__
+
+        return BOOKS[book_id], 201

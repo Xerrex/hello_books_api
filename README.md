@@ -7,6 +7,12 @@
 This is a Flask API for Hello-Books application. Hello-Books
 helps manage a library and its processes like stocking, tracking and renting books.
 
+##EndPoints
+* `GET: /api/v1/books`  to get all books
+* `POST: /api/v1/books` to add a book
+* `PUT: /api/v1/books/<bookId>` to modify book details
+
+
 ## Technologies used
 * **[Python3](https://www.python.org/downloads/)** - A programming language that lets you work more quickly (The universe loves speed!).
 * **[Flask](flask.pocoo.org/)** - A microframework for Python based on Werkzeug, Jinja 2 and good intentions
@@ -30,7 +36,7 @@ helps manage a library and its processes like stocking, tracking and renting boo
         $ cd hello_books_api
         ```
 
-    2. Create and fire up your virtual environment in python3:
+    2. Create and activate virtual environment in python3:
         ```
         $ virtualenv -p python3.6 venv
         $ pip install autoenv
@@ -39,4 +45,20 @@ helps manage a library and its processes like stocking, tracking and renting boo
     Create a .env file and add the following:
     ```
     source venv/bin/activate
+    export FLASK_APP="run.py"
+    export FLASK_CONFIG='dev_env'
+    export SECRET_KEY="add a very long random sentence or string "
+    export FLASK_DEBUG=1
+    
     ```
+    Now navigating to this directory `Autoenv`automagically set the variables.Sensitive info 
+    is hidden to outiside world too. 
+    
+    if not prompted by `Autoenv` run `source .env` to set variables.
+
+* #### Install your requirements
+    With virtual enviroment activated run:
+    
+    ```
+    pip install -r requirements.txt
+    ```    

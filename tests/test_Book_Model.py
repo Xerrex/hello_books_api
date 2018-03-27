@@ -55,7 +55,7 @@ class BookModelCase(unittest.TestCase):
 
         response = self.client.post('/api/v1/books', data=json.dumps(new_book), content_type='application/json')
 
-        edited_book ={
+        edited_book = {
             'name': 'chenco the dev2',
             'description': 'The struggles to get blinding skills2',
             'section': 'biography',
@@ -80,15 +80,46 @@ class BookModelCase(unittest.TestCase):
 
         edit_book_data = {}
 
-        #create  book
+        # create  book
         response = self.client.post('/api/v1/books', data=json.dumps(new_book), content_type='application/json')
 
-        #edit book
+        # edit book
         response = self.client.put('/api/v1/books/book1', data=json.dumps(edit_book_data),
                                    content_type='application/json')
 
         self.assertEqual(response.status_code, 400)
 
+    def test_book_info_accurate(self):
+        '''
+        Ensure that the correct book is returned
+        '''
+
+        new_book = {
+            'name': 'chenco the dev2',
+            'description': 'The struggles of getting mad skills2',
+            'section': 'biography',
+            'quantity': 42
+        }
+
+
+        #check books avaible
+        from app.views import BOOKS
+
+        book_id = len(BOOKS)
+
+        self.client.post('/api/v1/books', data=json.dumps(new_book), content_type='application/json')
+
+        book_id = book_id+1
+
+        response = self.client.get('/api/v1/books/book%s' %book_id, content_type='application/json')
+
+        self.assertTrue('chenco the dev2' in response.get_data(as_text=True))
+
+    def test_response_if_book_doesnt_esist(self):
+
+        response = self.client.get('/api/v1/books/book100', content_type='application/json')
+
+        self.assertTrue(response.status_code == 404)
 
 
 

@@ -1,3 +1,4 @@
+from flask import make_response,jsonify
 from flask_restful import Resource, reqparse
 
 from app.models import Book
@@ -12,8 +13,6 @@ books_list=[]
 
 
 class BookResource(Resource):
-
-
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -42,13 +41,13 @@ class BookResource(Resource):
         section = args['section']
         quantity = args['quantity']
 
-
         #check if book exists in list
 
         for book in books_list:
-            if book.name == name:
+            if book['name'] == name:
                 return {'message': 'A Book with that name already exists'}, 409
             else:
-                new_book = Book(name=name, description=description, section=section, quantity=quantity)
+                new_book = {'name':name, 'description':description, 'section':section, 'quantity':quantity}
+
                 books_list.append(new_book)
-                return {'message': 'Book name: %s has been succesfully created' % new_book.name}, 200
+                return {'message': 'Book name: %s has been succesfully created' % name}, 200

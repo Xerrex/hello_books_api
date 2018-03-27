@@ -5,6 +5,12 @@ from app.models import Book
 
 BOOKS={}
 
+BOOKS2 = {
+    'book1': {'name': 'welcome to flask'},
+    'book2': {'name': 'Welcome to flask API DIY'},
+    'book3': {'name': 'Welcome to flask flask-restful'},
+}
+
 class BookResource(Resource):
 
     """
@@ -27,6 +33,12 @@ class BookResource(Resource):
         self.book_parser.add_argument('quantity', type=int, required=True,
                                       help='Book quantity is a Number cannot be blank ', location='json')
 
+    @staticmethod
+    def abort_if_book_does_not_esist(book_id):
+        if book_id not in BOOKS:
+            abort(404, message="Book:{} doesn't exist".format(book_id))
+
+
     def put(self, bookId):
         self.book_args = self.book_parser.parse_args()
 
@@ -39,9 +51,12 @@ class BookResource(Resource):
 
         BOOKS[bookId] = edited_book.__dict__
 
-        response = {'message':"Book:%s was updated" % bookId, "book":BOOKS[bookId] }
+        response = {'message':"Book:%s was updated" % bookId, 'data':BOOKS[bookId] }
         return response, 200
 
+    def get(self,bookId):
+        self.abort_if_book_does_not_esist(bookId)
+        return BOOKS[bookId]
 
 
 class BookListResource(Resource):

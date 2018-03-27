@@ -8,9 +8,10 @@ This is a Flask API for Hello-Books application. Hello-Books
 helps manage a library and its processes like stocking, tracking and renting books.
 
 ##EndPoints
-* `GET: /api/v1/books`  to get all books
-* `POST: /api/v1/books` to add a book
-* `PUT: /api/v1/books/<bookId>` to modify book details
+* `GET: /api/v1/books`  to get all books.
+* `POST: /api/v1/books` to add a book.
+* `PUT: /api/v1/books/<bookId>` to modify book details.
+* `GET: /api/v1/books/<bookId>` to view a book information.
 
 
 ## Technologies used

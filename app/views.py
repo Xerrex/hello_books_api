@@ -1,9 +1,11 @@
 from flask_restful import Resource, reqparse, abort
 
 from app.models.book import Book
+from app.models.user import User
 
-BOOKS = {}
+BOOKS = {}  # stores Book models
 
+USERS = {}  # stores User models
 
 class BookResource(Resource):
     """
@@ -100,3 +102,46 @@ class BookListResource(Resource):
         BOOKS[book_id] = new_book.__dict__
 
         return BOOKS[book_id], 201
+
+
+class UserRegisterResource(Resource):
+    """
+    Resource handles user Login
+    """
+    def __init__(self):
+        super().__init__()
+        self.user_parser = reqparse.RequestParser()
+
+        self.user_parser.add_argument('name', type=str, required=True,
+                                      help='Name cannot be blank', location='json')
+
+        self.user_parser.add_argument('email', type=str, required=True,
+                                      help="Email cannot be empty", location='json')
+
+        self.user_parser.add_argument('password', type=str, required=True,
+                                      help="password cannot be empty", location='json')
+
+        self.user_parser.add_argument('aboutme', type=str, location='json')
+
+    def post(self):
+        user_args = self.user_parser.parse_args()
+
+        user_name = user_args['name']
+        user_email = user_args['email']
+        user_password = user_args['password']
+        user_aboutme = user_args['aboutme']
+
+        for id in USERS.keys():
+            user = USERS[id]
+            if user['email'] == user_email:
+                return {'message': "User with that email already exists"}, 409
+
+        new_user = User(user_name, user_email, user_password, user_aboutme)
+
+        user_id = len(USERS) + 1
+
+        user_id = 'user%i' % user_id
+
+        USERS[user_id] = new_user.__dict__
+
+        return {"message":"User registration was successful", "details":new_user.__repr__()}, 201

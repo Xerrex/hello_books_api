@@ -1,16 +1,15 @@
 from flask_restful import Resource, reqparse, abort
 
-from app.models import Book
+from app.models.book import Book
 
-
-BOOKS={}
+BOOKS = {}
 
 
 class BookResource(Resource):
-
     """
     Handles request to : /api/v1/books/<bookId>
     """
+
     def __init__(self):
         super().__init__()
 
@@ -33,7 +32,6 @@ class BookResource(Resource):
         if book_id not in BOOKS:
             abort(404, message="Book:{} doesn't exist".format(book_id))
 
-
     def put(self, bookId):
         self.book_args = self.book_parser.parse_args()
 
@@ -46,22 +44,22 @@ class BookResource(Resource):
 
         BOOKS[bookId] = edited_book.__dict__
 
-        response = {'message':"Book:%s was updated" % bookId, 'data':BOOKS[bookId] }
+        response = {'message': "Book:%s was updated" % bookId, 'data': BOOKS[bookId]}
         return response, 200
 
-    def get(self,bookId):
+    def get(self, bookId):
         self.abort_if_book_does_not_esist(bookId)
         return BOOKS[bookId]
 
-    def delete(self,bookId):
+    def delete(self, bookId):
         self.abort_if_book_does_not_esist(bookId)
         del BOOKS[bookId]
 
-        response = {'message':"Book:%s was deleted" % bookId,}
+        response = {'message': "Book:%s was deleted" % bookId, }
         return response, 204
 
-class BookListResource(Resource):
 
+class BookListResource(Resource):
     """
     Handles requests to :/api/v1/books
     """
@@ -94,8 +92,7 @@ class BookListResource(Resource):
         book_section = self.book_args['section']
         book_qty = self.book_args['quantity']
 
-
-        book_id = len(BOOKS.keys())+1
+        book_id = len(BOOKS.keys()) + 1
 
         book_id = 'book%i' % book_id
 

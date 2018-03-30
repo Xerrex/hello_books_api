@@ -1,18 +1,24 @@
 # Hello_books_api
 
 ![license](https://img.shields.io/github/license/mashape/apistatus.svg)
+
 [![Build Status](https://travis-ci.org/Xerrex/hello_books_api.svg?branch=develop)](https://travis-ci.org/Xerrex/hello_books_api)
+
+[![Coverage Status](https://coveralls.io/repos/github/Xerrex/hello_books_api/badge.svg?branch=develop)](https://coveralls.io/github/Xerrex/hello_books_api?branch=develop)
+
+[![Test Coverage](https://api.codeclimate.com/v1/badges/f198d0ee5be9bc93d9d9/test_coverage)](https://codeclimate.com/github/Xerrex/hello_books_api/test_coverage)
 
 ## Introduction
 This is a Flask API for Hello-Books application. Hello-Books
 helps manage a library and its processes like stocking, tracking and renting books.
 
-##EndPoints
+## EndPoints
 * `GET:     /api/v1/books`  to get all books.
 * `POST:    /api/v1/books` to add a book.
 * `PUT:     /api/v1/books/<bookId>` to modify book details.
 * `GET:     /api/v1/books/<bookId>` to view a book information.
-* `DELETE:  /api/v1/books/<bookId>` to delete a book 
+* `DELETE:  /api/v1/books/<bookId>` to delete a book. 
+* `POST:    /api/v1/auth/register` to register a new user.
 
 
 ## Technologies used

@@ -5,7 +5,8 @@ import unittest
 import json
 
 from app import create_app
-from app.models import Book
+
+from app.models.book import Book
 
 from app.views import BOOKS
 

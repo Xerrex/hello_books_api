@@ -6,7 +6,7 @@ class User(object):
 
     name, email, password, aboutme, lastseen
     """
-    def __init__(self, name, email, password, aboutme):
+    def __init__(self, name, email, password, aboutme=None):
         self.name = name
         self.email = email  # Email should be unique
         self.password = generate_password_hash(password)

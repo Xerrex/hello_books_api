@@ -1,6 +1,6 @@
-'''
+"""
 Test  CRUD operation on that book model
-'''
+"""
 from unittest import main
 import json
 

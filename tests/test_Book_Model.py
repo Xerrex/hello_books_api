@@ -1,39 +1,32 @@
 '''
 Test  CRUD operation on that book model
 '''
-import unittest
+from unittest import main
 import json
 
-from app import create_app
-
+from tests import TestBase
 from app.models.book import Book
 
 from app.views import BOOKS
 
 
-class BookModelCase(unittest.TestCase):
-
-    def setUp(self):
-        self.app = create_app(config_env_name="testing_env")
-        self.client = self.app.test_client()
-
-    def tearDown(self):
-        pass
+class BookModelCase(TestBase):
 
     def test_book_init_is_accurate(self):
-        '''
+        """
         Test that Book initialization via the model works
-        '''
+        """
 
         book1 = Book('chenco the dev', 'The struggles of getting mad skills', 'biography', 4)
 
         self.assertEqual(book1.name, 'chenco the dev')
 
     def test_book_creation(self):
-        '''
+        """
         Test that a valid POST request to /api/v1/books
         will create a new book
-        '''
+        """
+
         book_data = {
             'name': 'chenco the dev',
             'description': 'The struggles of getting mad skills',
@@ -47,11 +40,10 @@ class BookModelCase(unittest.TestCase):
         self.assertIn(book_data['name'], response.get_data(as_text=True))
 
     def test_book_creation_no_blanks(self):
-
-        '''
-        Test that a empty request to create a book fails
-        with Bad request error
-        '''
+        """
+        Test that a empty POST request to /api/v1/books to
+        create a book failsith Bad request error
+        """
 
         book_data = {}
 
@@ -59,9 +51,10 @@ class BookModelCase(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_editing_of_book(self):
-        '''
+        """
         Test that a editing of a book is possible
-        '''
+        via PUT request to /api/v1/books/<bookId>
+        """
 
         new_book = {
             'name': 'chenco the dev2',
@@ -85,9 +78,11 @@ class BookModelCase(unittest.TestCase):
         self.assertTrue(response.status_code == 200)
 
     def test_for_empty_edit_request(self):
-        '''
-        Ensure that empty data to Put Request will not update Book details.
-        '''
+        """
+        Test that empty data to PUT Request to /api/v1/books/<bookId>
+        will not update Book details.
+        """
+
         new_book = {
             'name': 'chenco the dev2',
             'description': 'The struggles of getting mad skills2',
@@ -107,9 +102,10 @@ class BookModelCase(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_book_info_accurate(self):
-        '''
-        Ensure that the correct book is returned
-        '''
+        """
+        Test that the correct book is returned on
+        Get request to /api/v1/books/<bookId>
+        """
 
         new_book = {
             'name': 'chenco the dev2',
@@ -130,35 +126,36 @@ class BookModelCase(unittest.TestCase):
         self.assertTrue('chenco the dev2' in response.get_data(as_text=True))
 
     def test_response_if_book_doesnt_esist(self):
-        '''
+        """
         Test that a GET request to /api/v1/books/<bookId>
         with bookId that does not exists fails with status code 404.
-        '''
+        """
 
         response = self.client.get('/api/v1/books/book100', content_type='application/json')
 
         self.assertTrue(response.status_code == 404)
 
     def test_delete_of_a_book(self):
-        '''
+        """
         Test that a valid DELETE request to /api/v1/books/<bookId>
-         delets a book
-        '''
+        deletes a book
+        """
 
-        #delete book created from previous test: test_book_info_accurate
+        # delete book created from previous test: test_book_info_accurate
+
         book_id = len(BOOKS)
         response = self.client.delete('/api/v1/books/book%s' % book_id, content_type='application/json')
         self.assertEqual(response.status_code, 204)
 
-
-    def test_delted_book_doesnt_exist(self):
-        '''
+    def test_deleting_book_doesnt_exist(self):
+        """
         Test that Delete request to /api/v1/books/<bookId>
         returns NOT FOUND error when book with bookId does NOT exist.
-        '''
+        """
+
         response = self.client.delete('/api/v1/books/100000', content_type='application/json')
         self.assertTrue(response.status_code == 404 )
 
 
 if __name__ == '__main__':
-    unittest.main(verbosity=2)
+    main(verbosity=2)

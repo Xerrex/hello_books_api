@@ -67,6 +67,17 @@ class TestBase(TestCase):
         assert response.status_code == 401
 
     @staticmethod
+    def assert403(response):
+        """Assert that request response is status code is 403
+
+        http_status code 403 = FORBIDDEN
+        :param response:
+        :return:
+        """
+
+        assert response.status_code == 403
+
+    @staticmethod
     def assert404(response):
         """Assert that request response is status code is 404
 

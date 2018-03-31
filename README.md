@@ -20,6 +20,7 @@ helps manage a library and its processes like stocking, tracking and renting boo
 * `DELETE:  /api/v1/books/<bookId>` to delete a book. 
 * `POST:    /api/v1/auth/register` to register a new user.
 * `POST:    /api/v1/auth/login` to login a user
+* `POST:    /api/v1/auth/logout` to logout user
 
 
 ## Technologies used
@@ -71,3 +72,11 @@ helps manage a library and its processes like stocking, tracking and renting boo
     ```
     pip install -r requirements.txt
     ```    
+
+* #### Running the APi
+    * On terminal run.
+    
+        `flask run`    
+    
+    * Use browser for `GET` request
+    * Use REST client ie `postman`

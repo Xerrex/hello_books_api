@@ -171,7 +171,6 @@ class UserLoginResource(Resource):
         user_email = login_args['email']
         user_password = login_args['password']
 
-
         for userID in USERS.keys():
             user = USERS[userID]
             if user['email']== user_email and check_password_hash(user['password'], user_password):
@@ -182,6 +181,23 @@ class UserLoginResource(Resource):
         return  {"message": "Invalid email or password. Makes sure to register first"}, 401
 
 
+class UserLogoutResource(Resource):
+
+    logout_parser = reqparse.RequestParser()
+    logout_parser.add_argument('userID', type=str, required=True,
+                               help="Forbidden Request", location='json')
+
+    def post(self):
+        logout_arg = self.logout_parser.parse_args()
+        user_id = logout_arg['userID']
+
+        if 'userID' not in session:
+            return {"message":"Kindly Login first: Forbidden Action"}, 403
+
+        session.pop('userId', None)
+
+        user_name = USERS[user_id]['name']
+        return {"message": "You have been successfully logged out {}".format(user_name)}, 200
 
 
 

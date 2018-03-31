@@ -12,7 +12,7 @@ def create_app(config_env_name):
     api = Api(app)
 
     #import Resources
-    from app.views import BookListResource, BookResource, UserRegisterResource, UserLoginResource
+    from app.views import BookListResource, BookResource, UserRegisterResource, UserLoginResource, UserLogoutResource
 
 
     #register endpoint
@@ -20,5 +20,6 @@ def create_app(config_env_name):
     api.add_resource(BookResource, '/api/v1/books/<bookId>', endpoint="list")
     api.add_resource(UserRegisterResource, '/api/v1/auth/register', endpoint="register")
     api.add_resource(UserLoginResource, '/api/v1/auth/login', endpoint="login")
+    api.add_resource(UserLogoutResource, '/api/v1/auth/logout', endpoint='logout')
 
     return app

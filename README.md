@@ -19,6 +19,7 @@ helps manage a library and its processes like stocking, tracking and renting boo
 * `GET:     /api/v1/books/<bookId>` to view a book information.
 * `DELETE:  /api/v1/books/<bookId>` to delete a book. 
 * `POST:    /api/v1/auth/register` to register a new user.
+* `POST:    /api/v1/auth/login` to login a user
 
 
 ## Technologies used

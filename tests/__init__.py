@@ -46,7 +46,6 @@ class TestBase(TestCase):
 
         assert response.status_code == 204
 
-
     @staticmethod
     def assert400(response):
         """Assert that request response is status code is 400

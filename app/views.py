@@ -1,4 +1,6 @@
+from flask import session
 from flask_restful import Resource, reqparse, abort
+from werkzeug.security import check_password_hash
 
 from app.models.book import Book
 from app.models.user import User
@@ -6,6 +8,7 @@ from app.models.user import User
 BOOKS = {}  # stores Book models
 
 USERS = {}  # stores User models
+
 
 class BookResource(Resource):
     """
@@ -145,3 +148,41 @@ class UserRegisterResource(Resource):
         USERS[user_id] = new_user.__dict__
 
         return {"message":"User registration was successful", "details":new_user.__repr__()}, 201
+
+
+class UserLoginResource(Resource):
+    """
+    Handle login request
+    """
+    def __init__(self):
+        super().__init__()
+
+        self.login_parser = reqparse.RequestParser()
+
+        self.login_parser.add_argument('email', type=str, required=True,
+                                       help="Email cannot be empty", location='json')
+
+        self.login_parser.add_argument('password', type=str, required=True,
+                                       help="password cannot be empty", location='json')
+
+    def post(self):
+        login_args = self.login_parser.parse_args()
+
+        user_email = login_args['email']
+        user_password = login_args['password']
+
+
+        for userID in USERS.keys():
+            user = USERS[userID]
+            if user['email']== user_email and check_password_hash(user['password'], user_password):
+                if 'userID' not in session:
+                    session['userID'] = userID
+                    return {"message": "Welcome back {}".format(user['name'])}, 200
+                return {"message": "Your already logged in {}".format(user['name'])}, 409
+        return  {"message": "Invalid email or password. Makes sure to register first"}, 401
+
+
+
+
+
+

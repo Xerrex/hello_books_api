@@ -1,12 +1,13 @@
-"""
-Test Operations Involving the user model
-Login, Register
+"""Test Operations Involving the user model
+
+Operations include: initialisation, Login, Register
 """
 from unittest import main
 import json
 
 from tests import TestBase
 from app.models.user import User
+from app.views import USERS
 
 
 class UserModelCase(TestBase):
@@ -124,7 +125,7 @@ class UserModelCase(TestBase):
         }
 
         self.client.post('/api/v1/auth/login', data=json.dumps(logging_credentials),
-                                    content_type='application/json')
+                         content_type='application/json')
 
         response = self.client.post('/api/v1/auth/login', data=json.dumps(logging_credentials),
                                     content_type='application/json')
@@ -174,6 +175,63 @@ class UserModelCase(TestBase):
 
         self.assert401(response)
         self.assertIn('or password. Makes sure to register first', response_data['message'])
+
+    def test_User_can_logout(self):
+        """Test that a User can log out:
+
+        Ensure that valid POST request to /api/v1/auth/logout
+        logs out a user.
+        """
+        new_user = {
+            "name": "Alex15",
+            "email": "alex@dev.com15",
+            "password": "12345678915",
+            "aboutme": "mad skills you15"
+        }
+
+        self.client.post('/api/v1/auth/register', data=json.dumps(new_user),
+                         content_type='application/json')
+
+        logging_credentials = {
+            "email": "alex@dev.com15",
+            "password": "12345678915"
+        }
+
+        response = self.client.post('/api/v1/auth/login', data=json.dumps(logging_credentials),
+                         content_type='application/json')
+
+        # get user id
+        loggedIn_userid = len(USERS)
+        loggedIn_userid = "user{}".format(loggedIn_userid)
+
+        loggedIn_userid = {
+            'userID': loggedIn_userid
+        }
+
+        response = self.client.post('/api/v1/auth/logout', data=json.dumps(loggedIn_userid),
+                                    content_type='application/json')
+
+        response_data = json.loads(response.get_data(as_text=True))
+
+        self.assert200(response)
+        self.assertIn("Alex15", response_data["message"])
+
+    def test_only_logged_in_User_logouts(self):
+        """Test that only logged in User can Logout
+
+        Ensure that only users whose who have been logged in can logout
+        """
+        logged_in_user = {
+            'userID': "user19"
+        }
+
+        response = self.client.post('/api/v1/auth/logout', data=json.dumps(logged_in_user),
+                                    content_type='application/json')
+
+        response_data = json.loads(response.get_data(as_text=True))
+
+        self.assert403(response)
+        self.assertIn("Kindly Login first", response_data["message"])
 
 
 if __name__ == '__main__':

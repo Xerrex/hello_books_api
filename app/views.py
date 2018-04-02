@@ -4,10 +4,13 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.models.book import Book
 from app.models.user import User
+from app.models.borrow import Borrow
 
 BOOKS = {}  # stores Book models
 
 USERS = {}  # stores User models
+
+BORROWS = {}  # stored Borrow models
 
 
 def get_user_id(email):
@@ -41,7 +44,7 @@ class BookResource(Resource):
                                       help='Book quantity is a Number cannot be blank ', location='json')
 
     @staticmethod
-    def abort_if_book_does_not_esist(book_id):
+    def abort_if_book_does_not_exist(book_id):
         if book_id not in BOOKS:
             abort(404, message="Book:{} doesn't exist".format(book_id))
 
@@ -61,11 +64,11 @@ class BookResource(Resource):
         return response, 200
 
     def get(self, bookId):
-        self.abort_if_book_does_not_esist(bookId)
+        self.abort_if_book_does_not_exist(bookId)
         return BOOKS[bookId]
 
     def delete(self, bookId):
-        self.abort_if_book_does_not_esist(bookId)
+        self.abort_if_book_does_not_exist(bookId)
         del BOOKS[bookId]
 
         response = {'message': "Book:%s was deleted" % bookId, }
@@ -181,12 +184,14 @@ class UserLoginResource(Resource):
 
         for userID in USERS.keys():
             user = USERS[userID]
-            if user['email']== user_email and check_password_hash(user['password'], user_password):
+            if user['email'] == user_email and check_password_hash(user['password'], user_password):
                 if 'userID' not in session:
                     session['userID'] = userID
                     return {"message": "Welcome back {}".format(user['name'])}, 200
+
                 return {"message": "Your already logged in {}".format(user['name'])}, 409
-        return  {"message": "Invalid email or password. Makes sure to register first"}, 401
+
+        return{"message": "Invalid email or password. Makes sure to register first"}, 401
 
 
 class UserLogoutResource(Resource):
@@ -274,3 +279,48 @@ class UserResetPasswordResource(Resource):
                 'message': "Something Went wrong with password reset"
             }
             return response, 401
+
+
+class BorrowResource(Resource):
+
+    def get(self, bookId):
+
+        # check if user is logged in first
+        if 'userID' not in session:
+            return {"message":"Kindly Login first: Forbidden Action"}, 401
+        BookResource.abort_if_book_does_not_exist(bookId)
+
+        user_id = session['userID']
+        self.abort_if_same_book_already_borrowed(user_id, bookId)
+
+        borrow_id = len(BORROWS) + 1
+
+        borrow_id = 'borrow%i' % borrow_id
+        new_borrow = Borrow(user_id, bookId)
+
+        BORROWS[borrow_id] = new_borrow.__dict__
+        response = {
+            "message": "You have successfully Borrowed the book"
+        }
+        return response, 201
+
+    @staticmethod
+    def abort_if_same_book_already_borrowed(user_id, book_id):
+        """
+        Abort when a user has already borrowed the same book
+        """
+
+        for borrow in BORROWS.values():
+            if borrow['user_id'] == user_id and borrow['book_id'] == book_id:
+                if borrow['is_active'] is True:
+                    abort(409, message="You already have the book borrowed")
+        return None
+
+
+
+
+
+
+
+
+

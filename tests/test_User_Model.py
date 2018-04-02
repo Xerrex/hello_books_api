@@ -136,7 +136,7 @@ class UserModelCase(TestBase):
 
         self.assertIn('Alex10', response_data['message'])
 
-    def test_invalid_useremail_login(self):
+    def test_invalid_user_email_login(self):
         """Test login with invalid email or email that does not exist
 
          Ensure that a valid POST request to /api/v1/auth/login
@@ -232,6 +232,80 @@ class UserModelCase(TestBase):
 
         self.assert403(response)
         self.assertIn("Kindly Login first", response_data["message"])
+
+    def test_user_can_reset_password(self):
+        """Test that a user can reset their password
+
+        Ensure that a user can be able to reset their password
+        """
+        new_user = {
+            "name": "Alex16",
+            "email": "alex@dev.com16",
+            "password": "12345678916",
+            "aboutme": "mad skills you16"
+        }
+
+        # register user
+        response = self.client.post('/api/v1/auth/register', data=json.dumps(new_user),
+                         content_type='application/json')
+
+        # get the new user's password
+        user_id = len(USERS)
+        user_id = "user{}".format(user_id)
+        new_user_password = USERS[user_id]['password']
+
+        # request password reset token
+        new_user_email = {
+            'email': "alex@dev.com16"
+        }
+        response = self.client.post('/api/v1/auth/reset-password', data=json.dumps(new_user_email),
+                                    content_type='application/json')
+
+        # get the reset token
+        response_data = json.loads(response.get_data(as_text=True))
+        reset_token = response_data['reset_token']
+
+        # make reset with token
+        password_reset_request = {
+            'email': "alex@dev.com16",
+            'reset_token': reset_token,
+            'new_password': '0987654321'
+        }
+
+        response = self.client.post('/api/v1/auth/reset-password', data=json.dumps(password_reset_request),
+                                    content_type='application/json')
+
+        # get new user reset password
+        user_id = len(USERS)
+        user_id = "user{}".format(user_id)
+        new_user_reset_password = USERS[user_id]['password']
+
+        # get response message
+        response_data = json.loads(response.get_data(as_text=True))
+        response_msg = response_data['message']
+
+        self.assert200(response)
+        self.assertIn('Your password has been successfully reset', response_msg)
+        self.assertFalse(new_user_reset_password == new_user_password)
+
+    def test_only_existing_user_reset_password(self):
+        """Test that only existing user can reset password
+
+        Ensure that non existent user cannot reset password.
+        """
+        # request password reset token
+        new_user_email = {
+            'email': "alex@dev.com100"
+        }
+        response = self.client.post('/api/v1/auth/reset-password', data=json.dumps(new_user_email),
+                                    content_type='application/json')
+        # get response message
+        response_data = json.loads(response.get_data(as_text=True))
+        response_msg = response_data['message']
+        expected_msg = "Your email was Not found. Please register first to reset password"
+
+        self.assert404(response)
+        self.assertIn(expected_msg,response_msg)
 
 
 if __name__ == '__main__':

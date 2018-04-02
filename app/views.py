@@ -1,6 +1,6 @@
 from flask import session
 from flask_restful import Resource, reqparse, abort
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.models.book import Book
 from app.models.user import User
@@ -8,6 +8,14 @@ from app.models.user import User
 BOOKS = {}  # stores Book models
 
 USERS = {}  # stores User models
+
+
+def get_user_id(email):
+    for user_id in USERS.keys():
+        user_email = USERS[user_id]['email']
+        if user_email == email:
+            return user_id
+    return
 
 
 class BookResource(Resource):
@@ -200,5 +208,69 @@ class UserLogoutResource(Resource):
         return {"message": "You have been successfully logged out {}".format(user_name)}, 200
 
 
+class UserResetPasswordResource(Resource):
 
+    reset_pass_parser = reqparse.RequestParser()
 
+    reset_pass_parser.add_argument('email', type=str, required=True,
+                                   help='Email cannot be empty', location='json')
+
+    reset_pass_parser.add_argument('reset_token', type=str, location='json')
+    reset_pass_parser.add_argument('new_password', type=str, location='json')
+
+    def post(self):
+
+        reset_pass_args = self.reset_pass_parser.parse_args()
+        user_email = reset_pass_args['email']
+        user_token = reset_pass_args['reset_token']
+        new_password = reset_pass_args['new_password']
+
+        # generate token just email was passed.
+        if not user_token:
+            user_id = get_user_id(user_email)
+            if user_id is None:
+                response = {
+                    'message': "Your email was Not found. Please register first to reset password"
+                }
+                return response, 404
+
+            # gen token
+            token = User.generate_token_value(user_email)
+            response = {
+                'message': 'Token generated successfully.Use the token value to reset your password',
+                'reset_token': token
+            }
+
+            return response, 201
+
+        # verify token value and take new password
+        elif not new_password:
+            response = {
+                'message': "New password is required to reset password"
+            }
+
+            return response, 400
+
+        # verify token & reset set password: email, reset_token, new_password are set
+        else:
+            user_email_token = User.verify_token_value(user_token)
+
+            if user_email_token is None:
+                response = {
+                    'message': 'Password Reset failed'
+                }
+                return response, 401
+
+            for userId in USERS.keys():
+                user_email_ds = USERS[userId]['email'].lstrip('@')
+                if user_email_ds == user_email_token:
+                    USERS[userId]['password'] = generate_password_hash(new_password)
+
+                    response = {
+                        'message': 'Your password has been successfully reset'
+                    }
+                    return response, 200
+            response = {
+                'message': "Something Went wrong with password reset"
+            }
+            return response, 401

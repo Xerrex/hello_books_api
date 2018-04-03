@@ -63,8 +63,12 @@ class BorrowModelCase(TestBase):
 
         Ensure that only logged in user can login.
         """
-        response = self.client.get('/api/v1/users/books/book1', content_type='application/json')
+        # book = {
+        #     'book_id':'book1'
+        # }
+        # response = self.client.post('/api/v1/users/books/book1', data=json.dumps(book), content_type='application/json')
 
+        response = self.client.post('/api/v1/users/books/book1', content_type='application/json')
         self.assert401(response)
 
     def test_borrowing_books_that_do_not_exist(self):
@@ -74,9 +78,7 @@ class BorrowModelCase(TestBase):
         """
         self.setup_things()
 
-        # borrow non existent book
-        response = self.client.get('/api/v1/users/books/book100', content_type='application/json')
-
+        response = self.client.post('/api/v1/users/books/book100', content_type='application/json')
         self.assert404(response)
 
         self.reset_things()
@@ -102,7 +104,8 @@ class BorrowModelCase(TestBase):
         # book id
         book_id = len(BOOKS)
         book_id = 'book%i' % book_id
-        response = self.client.get('/api/v1/users/books/{}'.format(book_id), content_type='application/json')
+
+        response = self.client.post('/api/v1/users/books/{}'.format(book_id), content_type='application/json')
 
         self.assert201(response)
 
@@ -130,9 +133,9 @@ class BorrowModelCase(TestBase):
         book_id = len(BOOKS)
         book_id = 'book%i' % book_id
 
-        response = self.client.get('/api/v1/users/books/{}'.format(book_id), content_type='application/json')
+        response = self.client.post('/api/v1/users/books/{}'.format(book_id), content_type='application/json')
 
-        response = self.client.get('/api/v1/users/books/{}'.format(book_id), content_type='application/json')
+        response = self.client.post('/api/v1/users/books/{}'.format(book_id), content_type='application/json')
 
         self.assert409(response)
 

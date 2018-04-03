@@ -283,8 +283,8 @@ class UserResetPasswordResource(Resource):
 
 class BorrowResource(Resource):
 
-    def get(self, bookId):
-
+    def post(self, bookId):
+        
         # check if user is logged in first
         if 'userID' not in session:
             return {"message":"Kindly Login first: Forbidden Action"}, 401

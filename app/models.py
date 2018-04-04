@@ -4,6 +4,44 @@ import jwt
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from flask_restful import abort
+
+USERS = {}  # stores User models
+
+BOOKS = {}  # stores Book models
+
+BORROWS = {}  # stored Borrow models
+
+
+def get_user_id(email):
+    """Finds a user by their email
+
+    :param email:
+    """
+    for user_id in USERS.keys():
+        user_email = USERS[user_id]['email']
+        if user_email == email:
+            return user_id
+    return
+
+
+def abort_if_book_does_not_exist(book_id):
+    if book_id not in BOOKS:
+        abort(404, message="Book:{} doesn't exist".format(book_id))
+
+
+def abort_if_same_book_already_borrowed(user_id, book_id):
+
+    """
+    Abort when a user has already borrowed the same book
+    """
+
+    for borrow in BORROWS.values():
+        if borrow['user_id'] == user_id and borrow['book_id'] == book_id:
+            if borrow['is_active'] is True:
+                abort(409, message="You already have the book borrowed")
+    return None
+
 
 class User(object):
     """class defines User data model

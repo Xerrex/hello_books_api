@@ -6,8 +6,7 @@ import json
 
 from tests import TestBase
 from app.models import Borrow
-from app.views import USERS
-from app.views import BOOKS
+from app.models import USERS, BOOKS
 
 
 class BorrowModelCase(TestBase):

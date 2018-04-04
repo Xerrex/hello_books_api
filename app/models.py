@@ -10,7 +10,7 @@ USERS = {}  # stores User models
 
 BOOKS = {}  # stores Book models
 
-BORROWS = {}  # stored Borrow models
+BORROWS = {}  # stores Borrow models
 
 
 def get_user_id(email):

@@ -1,127 +1,15 @@
 from flask import session
-from flask_restful import Resource, reqparse, abort
+from flask_restful import Resource, reqparse
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app.models.book import Book
-from app.models.user import User
-from app.models.borrow import Borrow
-
-BOOKS = {}  # stores Book models
-
-USERS = {}  # stores User models
-
-BORROWS = {}  # stored Borrow models
+from app.models import User, USERS, get_user_id
 
 
-def get_user_id(email):
-    for user_id in USERS.keys():
-        user_email = USERS[user_id]['email']
-        if user_email == email:
-            return user_id
-    return
-
-
-class BookResource(Resource):
-    """
-    Handles request to : /api/v1/books/<bookId>
-    """
-
-    def __init__(self):
-        super().__init__()
-
-        self.book_parser = reqparse.RequestParser()
-
-        self.book_parser.add_argument('name', type=str, required=True,
-                                      help='Book name cannot be blank', location='json')
-
-        self.book_parser.add_argument('description', type=str, required=True,
-                                      help='Book description cannot be blank', location='json')
-
-        self.book_parser.add_argument('section', type=str, required=True,
-                                      help='Please select Book section, empty be blank', location='json')
-
-        self.book_parser.add_argument('quantity', type=int, required=True,
-                                      help='Book quantity is a Number cannot be blank ', location='json')
-
-    @staticmethod
-    def abort_if_book_does_not_exist(book_id):
-        if book_id not in BOOKS:
-            abort(404, message="Book:{} doesn't exist".format(book_id))
-
-    def put(self, bookId):
-        self.book_args = self.book_parser.parse_args()
-
-        book_name = self.book_args['name']
-        book_desc = self.book_args['description']
-        book_section = self.book_args['section']
-        book_qty = self.book_args['quantity']
-
-        edited_book = Book(book_name, book_desc, book_section, book_qty)
-
-        BOOKS[bookId] = edited_book.__dict__
-
-        response = {'message': "Book:%s was updated" % bookId, 'data': BOOKS[bookId]}
-        return response, 200
-
-    def get(self, bookId):
-        self.abort_if_book_does_not_exist(bookId)
-        return BOOKS[bookId]
-
-    def delete(self, bookId):
-        self.abort_if_book_does_not_exist(bookId)
-        del BOOKS[bookId]
-
-        response = {'message': "Book:%s was deleted" % bookId, }
-        return response, 204
-
-
-class BookListResource(Resource):
-    """
-    Handles requests to :/api/v1/books
-    """
-
-    def __init__(self):
-        super().__init__()
-
-        self.book_parser = reqparse.RequestParser()
-
-        self.book_parser.add_argument('name', type=str, required=True,
-                                      help='Book name cannot be blank', location='json')
-
-        self.book_parser.add_argument('description', type=str, required=True,
-                                      help='Book description cannot be blank', location='json')
-
-        self.book_parser.add_argument('section', type=str, required=True,
-                                      help='Please select Book section, empty be blank', location='json')
-
-        self.book_parser.add_argument('quantity', type=int, required=True,
-                                      help='Book quantity is a Number cannot be blank ', location='json')
-
-    def get(self):
-        return BOOKS
-
-    def post(self):
-        self.book_args = self.book_parser.parse_args()
-
-        book_name = self.book_args['name']
-        book_desc = self.book_args['description']
-        book_section = self.book_args['section']
-        book_qty = self.book_args['quantity']
-
-        book_id = len(BOOKS.keys()) + 1
-
-        book_id = 'book%i' % book_id
-
-        new_book = Book(book_name, book_desc, book_section, book_qty)
-        BOOKS[book_id] = new_book.__dict__
-
-        return BOOKS[book_id], 201
-
-
-class UserRegisterResource(Resource):
+class RegisterResource(Resource):
     """
     Resource handles user Login
     """
+
     def __init__(self):
         super().__init__()
         self.user_parser = reqparse.RequestParser()
@@ -158,13 +46,14 @@ class UserRegisterResource(Resource):
 
         USERS[user_id] = new_user.__dict__
 
-        return {"message":"User registration was successful", "details":new_user.__repr__()}, 201
+        return {"message": "User registration was successful", "details": new_user.__repr__()}, 201
 
 
-class UserLoginResource(Resource):
+class LoginResource(Resource):
     """
     Handle login request
     """
+
     def __init__(self):
         super().__init__()
 
@@ -191,11 +80,10 @@ class UserLoginResource(Resource):
 
                 return {"message": "Your already logged in {}".format(user['name'])}, 409
 
-        return{"message": "Invalid email or password. Makes sure to register first"}, 401
+        return {"message": "Invalid email or password. Makes sure to register first"}, 401
 
 
-class UserLogoutResource(Resource):
-
+class LogoutResource(Resource):
     logout_parser = reqparse.RequestParser()
     logout_parser.add_argument('userID', type=str, required=True,
                                help="Forbidden Request", location='json')
@@ -205,16 +93,15 @@ class UserLogoutResource(Resource):
         user_id = logout_arg['userID']
 
         if 'userID' not in session:
-            return {"message":"Kindly Login first: Forbidden Action"}, 403
+            return {"message": "Kindly Login first: Forbidden Action"}, 403
 
-        session.pop('userId', None)
+        session.pop('userID', None)
 
         user_name = USERS[user_id]['name']
         return {"message": "You have been successfully logged out {}".format(user_name)}, 200
 
 
-class UserResetPasswordResource(Resource):
-
+class ResetPasswordResource(Resource):
     reset_pass_parser = reqparse.RequestParser()
 
     reset_pass_parser.add_argument('email', type=str, required=True,
@@ -279,48 +166,3 @@ class UserResetPasswordResource(Resource):
                 'message': "Something Went wrong with password reset"
             }
             return response, 401
-
-
-class BorrowResource(Resource):
-
-    def post(self, bookId):
-        
-        # check if user is logged in first
-        if 'userID' not in session:
-            return {"message":"Kindly Login first: Forbidden Action"}, 401
-        BookResource.abort_if_book_does_not_exist(bookId)
-
-        user_id = session['userID']
-        self.abort_if_same_book_already_borrowed(user_id, bookId)
-
-        borrow_id = len(BORROWS) + 1
-
-        borrow_id = 'borrow%i' % borrow_id
-        new_borrow = Borrow(user_id, bookId)
-
-        BORROWS[borrow_id] = new_borrow.__dict__
-        response = {
-            "message": "You have successfully Borrowed the book"
-        }
-        return response, 201
-
-    @staticmethod
-    def abort_if_same_book_already_borrowed(user_id, book_id):
-        """
-        Abort when a user has already borrowed the same book
-        """
-
-        for borrow in BORROWS.values():
-            if borrow['user_id'] == user_id and borrow['book_id'] == book_id:
-                if borrow['is_active'] is True:
-                    abort(409, message="You already have the book borrowed")
-        return None
-
-
-
-
-
-
-
-
-

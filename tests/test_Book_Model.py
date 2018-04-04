@@ -5,9 +5,9 @@ from unittest import main
 import json
 
 from tests import TestBase
-from app.models.book import Book
+from app.models import Book
 
-from app.views import BOOKS
+from app.models import BOOKS
 
 
 class BookModelCase(TestBase):

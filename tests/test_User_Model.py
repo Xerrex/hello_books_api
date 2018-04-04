@@ -6,8 +6,8 @@ from unittest import main
 import json
 
 from tests import TestBase
-from app.models.user import User
-from app.views import USERS
+from app.models import User
+from app.models import USERS
 
 
 class UserModelCase(TestBase):

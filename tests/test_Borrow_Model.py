@@ -5,7 +5,7 @@ Operations include: initialisation, borrow_book, return_book
 import json
 
 from tests import TestBase
-from app.models.borrow import Borrow
+from app.models import Borrow
 from app.views import USERS
 from app.views import BOOKS
 

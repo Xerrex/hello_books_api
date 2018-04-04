@@ -2,9 +2,7 @@ from flask import session
 from flask_restful import Resource, reqparse, abort
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app.models.book import Book
-from app.models.user import User
-from app.models.borrow import Borrow
+from app.models import Book, User, Borrow
 
 BOOKS = {}  # stores Book models
 

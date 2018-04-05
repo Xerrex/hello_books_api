@@ -1,0 +1,313 @@
+FORMAT: 1A
+HOST: https://hello-books-api-xerrex.herokuapp.com/
+
+# Hello Books API
+
+This is a Flask API for Hello-Books application. Hello-Books helps manage 
+a library and its processes like stocking, tracking and renting books.
+
+## hello Books root [/api/v1]
+### Home [GET]
+
+This resource does not have any attributes. Instead it 
+offers the initial API affordances in the form of links.
+
++ Response 200 (application/json)
+
+        {
+            "message": "Welcome to Hello Books API. Got to [link] to view Doc"
+        }
+        
+## Group Authentication
+This resources are related to Authentication of a User
+
+### Register [/auth/register]
+### Register[POST]
+You can create a user by sending a json request with an name, email, password and aboutme. 
+
++ Request (application/json)
+
+        {
+            "name": "Alex",
+            "email": "alex@dev.com",
+            "password": "123456789",
+            "aboutme": "mad skills you"
+        }
+        
++ Response 201 (application/json)
+
+    + Body
+
+            {
+                "message": "User registration was successful",
+                "details": "User-Alex-alex@dev.com-2018-04-04 10:45:49.217986",
+            }
+            
+            
++ Response 409 (application/json)
+
+    + Body
+
+            {
+                "message": "User with that email already exists"
+            }
+
+### Login [/auth/login]
+### Login [POST]
+You can login as a User via this action. It takes a JSON object 
+containing a email and password.Endpoint also returns a failure message 
+when the user is already registered.
+
++ Request (application/json)
+
+        {
+            "email": "alex@dev.com",
+            "password": "123456789"
+        }
+        
+
++ Response 200 (application/json)
+
+
+    + Body
+
+            {
+                "message": "Welcome back Alex"
+            }
+
++ Response 409 (application/json)
+
+
+    + Body
+
+            {
+                "message": "Your already logged in Alex"
+            }
+
+### Logout [/auth/logout]
+### logout [POST]
+You can logout as a User via this action. It takes a JSON object 
+containing a userID.Endpoint also returns a failure message 
+when the user is already logged out.
+
++ Request (application/json)
+
+        {
+            "userID":"user1",
+        }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "message": "You have been successfully logged out Alex"
+            }
+            
++ Response 203 (application/json)
+
+    + Body
+
+            {
+                "message": "Kindly Login first: Forbidden Action"
+            }
+
+### Reset password collection [/auth/reset-password]
+### Reset Password-request [POST]
+You can request password reset token using this action. It takes a JSON object containing 
+a email to request password reset token.
+
++ Request (application/json)
+
+        {
+            "email":"alex@dev.com"
+        }
+
++ Response 201 (application/json)
+
+    + Body
+
+            {
+                "message": "Token generated successfully.Use the token value to reset your password",
+                "reset_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZXNldF9wYXNzd29yZF9lbWFpbCI6ImFsZXhAZGV2LmNvbSIsImV4cCI6MTUyMjg0MzI3OCwiaWF0IjoxNTIyODQyOTc4fQ.maU2nlBX1B3l7CzEcXxnQ7gvsvbvHW7Kq8ak3Ntj7-0"
+            }
+
+### Reset Password [PUT]
+You can reset your password using this action. It takes a JSON object containing 
+a email, reset token and new_password to request password reset token. 
+If the token expires the password reset fails.
+
++ Request (application/json)
+
+        {
+            "email":"alex@dev.com",
+            "reset_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZXNldF9wYXNzd29yZF9lbWFpbCI6ImFsZXhAZGV2LmNvbSIsImV4cCI6MTUyMjg0MzI3OCwiaWF0IjoxNTIyODQyOTc4fQ.maU2nlBX1B3l7CzEcXxnQ7gvsvbvHW7Kq8ak3Ntj7-0",
+            "new_password": "3056998",
+        }
+        
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                 "message": "Your password has been successfully reset"
+            }
+            
++ Response 401 (application/json)
+
+    + Body
+
+            {
+                 "message": "Password Reset failed"
+            }
+            
+## Group Books 
+This resources are related to Books
+
+## Books collection [/books]
+### List all Books [GET]
+You can retrieve all the books via this action.
+
++ Response 200 (application/json)
+
+        {
+            "book1": {
+                "name": "Book1",
+                "description": "coming soon test book",
+                "section": "testing",
+                "quantity": 4
+            },
+            "book2": {
+                "name": "Book1",
+                "description": "coming soon test book",
+                "section": "testing",
+                "quantity": 4
+            },
+            "book3": {
+                "name": "Book1",
+                "description": "coming soon test book",
+                "section": "testing",
+                "quantity": 4
+            }
+        }
+
+### Create a new book [POST]
+You may create a book using this action. It takes a JSON
+object containing a name, description, section and quantity of books as an integer.
++ Request (application/json)
+
+        {
+            "name":"Book1",
+            "description":"coming soon test book",
+            "section":"testing",
+            "quantity":4
+        }
+        
++ Response 201 (application/json)
+
+    + Body
+
+            {
+                "name": "Book1",
+                "description": "coming soon test book",
+                "section": "testing",
+                "quantity": 4
+            }
+
+
+## Book collection [/books/{bookId}]
+### view a book [GET]
+You can access Functions: view, edit, delete on a single book 
+with the id passed in Url. if book not found a 404 respponse is given.
+
++ Parameters
+
+    + bookId: bookk1 (number) - An unique identifier of the book.
+
++ Response 200 (application/json)
+
+        {
+            "name": "Book1",
+            "description": "coming soon test book",
+            "section": "testing",
+            "quantity": 4
+        }
+
++ Response 404 (application/json)
+
+        {
+            "message": "Book:book1 doesn't exist. You have requested this URI [/api/v1/books/book1] but did you mean /api/v1/books/<bookId> or /api/v1/books or /api/v1/users/books/<bookId> ?"
+        }
+
+### Edit a book [PUT]
+You may update a book's details via this action. It takes a JSON Object containing 
+name, description, section and Quantity or number of copies.
+
++ Request (application/json)
+
+        {
+            "name":"welcome to flasking",
+            "description":"Working with flask under pressure",
+            "section":"programming",
+            "quantity":30
+        }
+        
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "message": "Book:book1 was updated",
+                "data": {
+                    "name": "welcome to flasking",
+                    "description": "Working with flask under pressure",
+                    "section": "programming",
+                    "quantity": 30
+                    
+                },
+            }
+
++ Response 404 (application/json)
+
+        {
+            "message": "Book:book1 doesn't exist. You have requested this URI [/api/v1/books/book1] but did you mean /api/v1/books/<bookId> or /api/v1/books or /api/v1/users/books/<bookId> ?"
+        }
+            
+### Delete a book[DELETE]
+You may permanently delete a book via this action. Endpoint parses bookId from URL.
++ Request (application/json)
+
+        {
+        }
+
++ Response 204 (application/json)
+
+
+## Group Book Renting
+You make access the renting functions ie.Borrow, Returning on a book.
+### Book Renting [/users/books/{bookId}]
+### Borrow Book [POST]
+Contains resources that work on Book borrowing. This endpoints require the 
+user be logged in first.
+
++ Parameters
+
+    + bookId: bookk1 (number) - An unique identifier of the book.
+
++ Request (application/json)
+
+        
++ Response 201 (application/json)
+
+        {
+            "message": "You have successfully Borrowed the book"
+        }
+        
++ Response 409 (application/json)
+
+        {
+            "message": "You already have the book borrowed"
+        }    
+        
+        
+        

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 
 # local imports
 from config import app_env_configs
@@ -16,5 +16,10 @@ def create_app(config_env_name):
 
     from .borrow import borrow_BP as book_Blueprint
     app.register_blueprint(book_Blueprint)
+
+    @app.route('/')
+    @app.route('/api/v1/')
+    def home():
+        return render_template('home.html'), 200
 
     return app

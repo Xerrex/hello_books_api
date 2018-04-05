@@ -96,8 +96,3 @@ class TestBase(TestCase):
         :return bool:
         """
         assert response.status_code == 409
-
-    def test_home_route(self):
-        response = self.client.get('/')
-
-        self.assert200(response)

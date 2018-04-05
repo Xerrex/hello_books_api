@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse
 
-from app.models import BOOKS, abort_if_book_does_not_exist
+from app.models import BOOKS, abort_if_book_does_not_exist, abort_if_book_exists
 from app.models import Book
 
 
@@ -10,7 +10,6 @@ class BookResource(Resource):
     """
 
     def __init__(self):
-        super().__init__()
 
         self.book_parser = reqparse.RequestParser()
 
@@ -94,6 +93,8 @@ class BookListResource(Resource):
         book_desc = book_args['description']
         book_section = book_args['section']
         book_qty = book_args['quantity']
+
+        abort_if_book_exists(book_name)
 
         book_id = len(BOOKS.keys()) + 1
 

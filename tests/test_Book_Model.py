@@ -51,6 +51,24 @@ class BookModelCase(TestBase):
         response = self.client.post('/api/v1/books', data=json.dumps(book_data), content_type='application/json')
         self.assert400(response)
 
+    def test_no_duplicates_in_creation(self):
+
+        book ={
+            'name': 'chenco the dev',
+            'description': 'The struggles of getting mad skills',
+            'section': 'biography',
+            'quantity': 4
+        }
+
+        response = self.client.post('/api/v1/books', data=json.dumps(book), content_type='application/json')
+
+        response = self.client.post('/api/v1/books', data=json.dumps(book), content_type='application/json')
+
+        response_data = json.loads(response.get_data(as_text=True))
+
+        self.assert409(response)
+        self.assertIn(book['name'], response_data['message'])
+
     def test_editing_of_book(self):
         """Test that a editing of a book is possible
 
@@ -148,7 +166,7 @@ class BookModelCase(TestBase):
 
         self.assertTrue('chenco the dev2' in response.get_data(as_text=True))
 
-    def test_response_if_book_doesnt_esist(self):
+    def test_response_if_book_doesnt_exist(self):
         """Test that getting a book with non-existing Id
 
         Ensure that a valid GET request to /api/v1/books/<bookId>

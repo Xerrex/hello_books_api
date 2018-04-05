@@ -31,6 +31,7 @@ class BookResource(Resource):
                                       location='json')
 
     def put(self, bookId):
+        abort_if_book_does_not_exist(bookId)
         book_args = self.book_parser.parse_args()
 
         book_name = book_args['name']

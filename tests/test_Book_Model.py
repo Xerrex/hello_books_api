@@ -1,7 +1,6 @@
 """
 Test  CRUD operation on that book model
 """
-from unittest import main
 import json
 
 from tests import TestBase
@@ -80,6 +79,25 @@ class BookModelCase(TestBase):
 
         self.assert200(response)
 
+    def test_editing_of_non_existent_book(self):
+        """Test that editing of non existent book
+
+        Ensure that a valid PUT request to /api/v1/books/<bookId>
+        to edit a book fails.
+        """
+        edited_book = {
+            'name': 'chenco the dev2',
+            'description': 'The struggles to get blinding skills2',
+            'section': 'biography',
+            'quantity': 30
+        }
+
+        response = self.client.put('/api/v1/books/book5000', data=json.dumps(edited_book),
+                                   content_type='application/json')
+        response_data = response
+        self.assert404(response)
+        self.assertIn("Book:book5000 doesn't exist", response.get_data(as_text=True))
+
     def test_for_empty_edit_request(self):
         """Test that empty data to book edit request
 
@@ -119,7 +137,7 @@ class BookModelCase(TestBase):
             'quantity': 42
         }
 
-        # check books availble
+        # check books available
         book_id = len(BOOKS)
 
         self.client.post('/api/v1/books', data=json.dumps(new_book), content_type='application/json')
@@ -163,7 +181,3 @@ class BookModelCase(TestBase):
 
         response = self.client.delete('/api/v1/books/100000', content_type='application/json')
         self.assert404(response)
-
-
-if __name__ == '__main__':
-    main(verbosity=2)

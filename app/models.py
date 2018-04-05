@@ -26,8 +26,25 @@ def get_user_id(email):
 
 
 def abort_if_book_does_not_exist(book_id):
+    """Check if a book exists using ID
+
+    :param book_id:
+    :return:
+    """
     if book_id not in BOOKS:
-        abort(404, message="Book:{} doesn't exist".format(book_id))
+        abort(404, message= "Book:{} doesn't exist".format(book_id))
+
+
+def abort_if_book_exists(book_name):
+    """Check if Book exists using the book name
+
+    :param book_name:
+    :return:
+    """
+    for book in BOOKS.values():
+        name = book['name']
+        if name.lower() == book_name.lower():
+            abort(409, message= "Book with the name already exists - {}".format(book_name))
 
 
 def abort_if_same_book_already_borrowed(user_id, book_id):

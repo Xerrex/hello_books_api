@@ -20,6 +20,12 @@ class BookModelCase(TestBase):
 
         self.assertEqual(book1.name, 'chenco the dev')
 
+    def test_list_all_books(self):
+
+        response = self.client.get('/api/v1/books')
+
+        self.assert200(response)
+
     def test_book_creation(self):
         """Test Book creation
 

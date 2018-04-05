@@ -247,7 +247,7 @@ class UserModelCase(TestBase):
 
         # register user
         response = self.client.post('/api/v1/auth/register', data=json.dumps(new_user),
-                         content_type='application/json')
+                                    content_type='application/json')
 
         # get the new user's password
         user_id = len(USERS)
@@ -306,6 +306,46 @@ class UserModelCase(TestBase):
 
         self.assert404(response)
         self.assertIn(expected_msg,response_msg)
+
+    def test_new_password_is_required_to_reset_password(self):
+        """Test that the new_password is required
+
+        Confirm  that a valid post request /api/v1/auth/reset-password
+        to new_password.
+        """
+        new_user = {
+            "name": "Alex167",
+            "email": "alex@dev.com167",
+            "password": "123456789167",
+            "aboutme": "mad skills you167"
+        }
+
+        # register user
+        response = self.client.post('/api/v1/auth/register', data=json.dumps(new_user),
+                                    content_type='application/json')
+
+        # request password reset token
+        new_user_email = {
+            'email': "alex@dev.com167"
+        }
+
+        response = self.client.post('/api/v1/auth/reset-password', data=json.dumps(new_user_email),
+                                    content_type='application/json')
+
+        # get the reset token
+        response_data = json.loads(response.get_data(as_text=True))
+        reset_token = response_data['reset_token']
+
+        # make reset with token
+        password_reset_request = {
+            'email': "alex@dev.com16",
+            'reset_token': reset_token,
+        }
+
+        response = self.client.post('/api/v1/auth/reset-password', data=json.dumps(password_reset_request),
+                                    content_type='application/json')
+
+        self.assert400(response)
 
 
 if __name__ == '__main__':

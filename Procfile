@@ -1,1 +1,1 @@
-web: gunicorn -w 4 app:run
+web: gunicorn -w 4 run:create_app('pro_env')

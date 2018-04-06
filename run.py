@@ -1,6 +1,6 @@
 import os
 
-config_env_name = os.getenv('FLASK_CONFIG')
+config_env_name = os.getenv('FLASK_CONFIG') or 'pro_env'
 
 from app import create_app
 

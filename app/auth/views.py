@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.models import User, USERS, get_user_id
+from app.utils.data_validators import string_validator, email_validator, length_validator
 
 
 class RegisterResource(Resource):
@@ -14,14 +15,14 @@ class RegisterResource(Resource):
         super().__init__()
         self.user_parser = reqparse.RequestParser()
 
-        self.user_parser.add_argument('name', type=str, required=True,
-                                      help='Name cannot be blank', location='json')
+        self.user_parser.add_argument('name', type=string_validator, required=True,
+                                      location='json')
 
-        self.user_parser.add_argument('email', type=str, required=True,
-                                      help="Email cannot be empty", location='json')
+        self.user_parser.add_argument('email', type=email_validator, required=True,
+                                      location='json')
 
-        self.user_parser.add_argument('password', type=str, required=True,
-                                      help="password cannot be empty", location='json')
+        self.user_parser.add_argument('password', type=length_validator, required=True,
+                                      location='json')
 
         self.user_parser.add_argument('aboutme', type=str, location='json')
 
@@ -59,11 +60,11 @@ class LoginResource(Resource):
 
         self.login_parser = reqparse.RequestParser()
 
-        self.login_parser.add_argument('email', type=str, required=True,
-                                       help="Email cannot be empty", location='json')
+        self.login_parser.add_argument('email', type=email_validator, required=True,
+                                       location='json')
 
-        self.login_parser.add_argument('password', type=str, required=True,
-                                       help="password cannot be empty", location='json')
+        self.login_parser.add_argument('password', type=length_validator, required=True,
+                                       location='json')
 
     def post(self):
         login_args = self.login_parser.parse_args()
@@ -104,11 +105,12 @@ class LogoutResource(Resource):
 class ResetPasswordResource(Resource):
     reset_pass_parser = reqparse.RequestParser()
 
-    reset_pass_parser.add_argument('email', type=str, required=True,
-                                   help='Email cannot be empty', location='json')
+    reset_pass_parser.add_argument('email', type=email_validator, required=True,
+                                   location='json')
 
     reset_pass_parser.add_argument('reset_token', type=str, location='json')
-    reset_pass_parser.add_argument('new_password', type=str, location='json')
+    reset_pass_parser.add_argument('new_password', type=length_validator,
+                                   location='json')
 
     def post(self):
 

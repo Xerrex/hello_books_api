@@ -3,6 +3,8 @@ from flask_restful import Resource, reqparse
 from app.models import BOOKS, abort_if_book_does_not_exist, abort_if_book_exists
 from app.models import Book
 
+from app.utils.data_validators import string_validator
+
 
 class BookResource(Resource):
     """
@@ -13,16 +15,13 @@ class BookResource(Resource):
 
         self.book_parser = reqparse.RequestParser()
 
-        self.book_parser.add_argument('name', type=str, required=True,
-                                      help='Book name cannot be blank',
+        self.book_parser.add_argument('name', type=string_validator, required=True,
                                       location='json')
 
-        self.book_parser.add_argument('description', type=str, required=True,
-                                      help='Book description cannot be blank',
+        self.book_parser.add_argument('description', type=string_validator, required=True,
                                       location='json')
 
-        self.book_parser.add_argument('section', type=str, required=True,
-                                      help='Please select Book section, empty be blank',
+        self.book_parser.add_argument('section', type=string_validator, required=True,
                                       location='json')
 
         self.book_parser.add_argument('quantity', type=int, required=True,
@@ -67,16 +66,13 @@ class BookListResource(Resource):
 
         self.book_parser = reqparse.RequestParser()
 
-        self.book_parser.add_argument('name', type=str, required=True,
-                                      help='Book name cannot be blank',
+        self.book_parser.add_argument('name', type=string_validator, required=True,
                                       location='json')
 
-        self.book_parser.add_argument('description', type=str, required=True,
-                                      help='Book description cannot be blank',
+        self.book_parser.add_argument('description', type=string_validator, required=True,
                                       location='json')
 
-        self.book_parser.add_argument('section', type=str, required=True,
-                                      help='Please select Book section, empty be blank',
+        self.book_parser.add_argument('section', type=string_validator, required=True,
                                       location='json')
 
         self.book_parser.add_argument('quantity', type=int, required=True,

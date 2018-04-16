@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>HB_API</title>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+
+</head>
+<body>
+  <nav class="light-blue lighten-1" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="{{ url_for('home') }}" class="brand-logo">HB-API</a>
+      <ul class="right hide-on-med-and-down">
+         <li>
+            <a class="waves-effect waves-light btn light-blue accent-1"
+               href="https://github.com/Xerrex/hello_books_api" target="_blank">Code </a>
+        </li>
+
+        <li>
+            <a class="waves-effect waves-light btn light-blue accent-1"
+               href="https://xerrex.github.io/hello_books" target="_blank"> Pages </a>
+        </li>
+
+        <li>
+            <a class="waves-effect waves-light btn light-blue accent-1"
+               href="https://hellobooksapixerrex.docs.apiary.io" target="_blank">Doc</a>
+        </li>
+
+        <!--li>
+            <a class="waves-effect waves-light btn light-blue accent-1"
+               href="https://hello-books-api-xerrex.herokuapp.com/" target="_blank">Demo</a>
+        </li-->
+
+      </ul>
+
+      <ul id="nav-mobile" class="sidenav">!
+        <li><a href="https://github.com/Xerrex/hello_books_api" target="_blank">Code</a></li>
+        <li><a href="https://xerrex.github.io/hello_books" target="_blank">Pages</a></li>
+        <li><a href="https://hellobooksapixerrex.docs.apiary.io" target="_blank">Doc</a></li>
+        <!--li><a href="https://hello-books-api-xerrex.herokuapp.com/" target="_blank">Demo</a></li-->
+      </ul>
+      <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
+
+  <div class="section no-pad-bot" id="index-banner">
+    <div class="container">
+      <br><br>
+      <h1 class="header center blue-text">Welcome to Hello Books API</h1>
+      <div class="row center">
+        <h5 class="header col s12 light">
+            This is a Flask API for Hello-Books application. Hello-Books
+            helps manage a library and its processes like stocking, tracking and renting books.
+            <a href="https://github.com/Xerrex/hello_books_api/blob/develop/README.md" target="_blank">Read more</a>
+        </h5>
+
+      </div>
+      <br><br>
+      <div class="row center">
+        <a href="https://github.com/Xerrex/hello_books_api"
+           class="btn-large waves-effect waves-light light-blue accent-1 hoverable"
+           target="_blank">
+            <i class="material-icons left white-text">bookmark</i>
+            Code - Github
+        </a>
+
+        <a href="https://github.com/Xerrex/hello_books_api"
+           class="btn-large waves-effect waves-light light-blue accent-1 hoverable"
+           target="_blank">
+            <i class="material-icons right white-text">tv</i>
+            Pages - Github Pages
+        </a>
+
+        <a href="https://hellobooksapixerrex.docs.apiary.io"
+           class="btn-large waves-effect waves-light light-blue accent-1 hoverable"
+           target="_blank">
+            <i class="material-icons left white-text">book</i>
+            Doc - Apiary
+        </a>
+
+        <!--a href="https://hello-books-api-xerrex.herokuapp.com/"
+           class="btn-large waves-effect waves-light light-blue accent-1 hoverable"
+           target="_blank">
+            <i class="material-icons right white-text">toys</i>
+            Demo - Heroku
+        </a-->
+      </div>
+    </div>
+  </div>
+
+  <br><br><br><br>
+  <footer class="page-footer blue">
+    <div class="container">
+      <div class="row">
+
+      </div>
+    </div>
+    <div class="footer-copyright blue">
+      <div class="container">HB-API &copy; 2018 </div>
+    </div>
+  </footer>
+
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+  <!-- Compiled and minified JavaScript -->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+   <script src="{{ url_for('static', filename='js/init.js')}}"></script>
+
+  </body>
+</html>

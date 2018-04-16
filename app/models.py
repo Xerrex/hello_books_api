@@ -32,7 +32,7 @@ def abort_if_book_does_not_exist(book_id):
     :return:
     """
     if book_id not in BOOKS:
-        abort(404, message= "Book:{} doesn't exist".format(book_id))
+        abort(404, message="Book:{} doesn't exist".format(book_id))
 
 
 def abort_if_book_exists(book_name):
@@ -44,19 +44,33 @@ def abort_if_book_exists(book_name):
     for book in BOOKS.values():
         name = book['name']
         if name.lower() == book_name.lower():
-            abort(409, message= "Book with the name already exists - {}".format(book_name))
+            abort(409, message="Book with the name already exists - {}".format(book_name))
 
 
 def abort_if_same_book_already_borrowed(user_id, book_id):
-
     """
     Abort when a user has already borrowed the same book
+    """
+    for borrow in BORROWS.values():
+        if borrow['user_id'] == user_id and borrow['book_id'] == book_id:
+            if borrow['is_active'] is True:
+                abort(409, message="You already have the book borrowed")
+    return None
+
+
+def get_active_borrow(user_id, book_id):
+    """Finds a Borrow that is active
+
+    :param user_id:
+        id of user borrowing the book
+    :param book_id:
+        id of book being borrowed
     """
 
     for borrow in BORROWS.values():
         if borrow['user_id'] == user_id and borrow['book_id'] == book_id:
             if borrow['is_active'] is True:
-                abort(409, message="You already have the book borrowed")
+                return borrow
     return None
 
 

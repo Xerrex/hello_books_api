@@ -1,4 +1,4 @@
-# Hello_books_api
+# [Hello_books_api](https://hello-books-api-xerrex.herokuapp.com/)
 
 ![license](https://img.shields.io/github/license/mashape/apistatus.svg) [![Build Status](https://travis-ci.org/Xerrex/hello_books_api.svg?branch=develop)](https://travis-ci.org/Xerrex/hello_books_api) [![Coverage Status](https://coveralls.io/repos/github/Xerrex/hello_books_api/badge.svg?branch=develop)](https://coveralls.io/github/Xerrex/hello_books_api?branch=develop) [![Maintainability](https://api.codeclimate.com/v1/badges/f198d0ee5be9bc93d9d9/maintainability)](https://codeclimate.com/github/Xerrex/hello_books_api/maintainability)
 
@@ -19,9 +19,15 @@ All the endpoints take a `'application/json'` content type header
 * `POST:    /api/v1/auth/register` to register a new user.
 * `POST:    /api/v1/auth/login` to login a user
 * `POST:    /api/v1/auth/logout` to logout user
-* `Post:    /api/v1/auth/reset-password` to reset password: Done in two steps
-    1. Pass only an `email` to get `reset_token`
-    2. with `email, reset_token, new_password` to reset password
+* `POST:    /api/v1/auth/reset-password` to reset password:
+    ```
+     Done in two steps
+      1. Pass only an `email` to get `reset_token`
+      2. with `email, reset_token, new_password` to reset password
+    ```
+    
+* `POST:    /api/v1/users/books` to borrow a book
+* `POST:    /api/v1/uers/books/<bookId>` to return a book
 
 
 ## Technologies used

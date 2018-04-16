@@ -285,10 +285,35 @@ You may permanently delete a book via this action. Endpoint parses bookId from U
 
 ## Group Book Renting
 You make access the renting functions ie.Borrow, Returning on a book.
-### Book Renting [/users/books/{bookId}]
-### Borrow Book [POST]
+### Borrow [/users/books]
 Contains resources that work on Book borrowing. This endpoints require the 
-user be logged in first.
+user be logged in first. Gives a 409 error if book is already borrowed.
+It also gives a 404 error if book being borrowed does not exist.
+### Borrow book [POST]
++ Request (application/json)
+
+        {
+            "book_id":"book1",
+        }
+
++ Response 201 (application/json)
+
+        {
+            "message": "You have successfully Borrowed the book"
+        }
+        
++ Response 201 (application/json)
+
+        {
+            "message": "You already have the book borrowed"
+        }
+
+### Retuning [/users/books/{bookId}]
+Contains resources that work on Book returning. This endpoints require the 
+user be logged in first and to have actually borrowed the book. It gives 
+a 403 if the book is not already borrowed.
+
+### Return Book [PUT]
 
 + Parameters
 
@@ -297,16 +322,16 @@ user be logged in first.
 + Request (application/json)
 
         
-+ Response 201 (application/json)
++ Response 200 (application/json)
 
         {
-            "message": "You have successfully Borrowed the book"
+            "message": "Book has been successfully returned"
         }
         
-+ Response 409 (application/json)
++ Response 403 (application/json)
 
         {
-            "message": "You already have the book borrowed"
+            "message": "You Need to borrow the book first"
         }    
         
         

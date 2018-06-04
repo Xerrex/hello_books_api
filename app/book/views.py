@@ -56,7 +56,7 @@ class BookResource(Resource):
         return response, 204
 
 
-class BookListResource(Resource):
+class BooksResource(Resource):
     """
     Handles requests to :/api/v1/books
     """

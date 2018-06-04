@@ -1,6 +1,6 @@
 """Defines methods that manipulate user data.
 
-This methods dicouple the views and the models.
+This methods decouple the views and the models.
 """
 from app.models import USERS, User
 

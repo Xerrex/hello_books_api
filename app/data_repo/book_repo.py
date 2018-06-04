@@ -1,6 +1,6 @@
 """Defines methods that manipulate book data.
 
-This methods dicouple the Resources and the Book model.
+This methods decouple the Resources and the Book model.
 """
 from flask_restful import abort
 from app.models import BOOKS, Book

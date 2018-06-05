@@ -4,74 +4,12 @@ import jwt
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from flask_restful import abort
 
 USERS = {}  # stores User models
 
 BOOKS = {}  # stores Book models
 
 BORROWS = {}  # stores Borrow models
-
-
-def get_user_id(email):
-    """Finds a user by their email
-
-    :param email:
-    """
-    for user_id in USERS.keys():
-        user_email = USERS[user_id]['email']
-        if user_email == email:
-            return user_id
-    return
-
-
-def abort_if_book_does_not_exist(book_id):
-    """Check if a book exists using ID
-
-    :param book_id:
-    :return:
-    """
-    if book_id not in BOOKS:
-        abort(404, message="Book:{} doesn't exist".format(book_id))
-
-
-def abort_if_book_exists(book_name):
-    """Check if Book exists using the book name
-
-    :param book_name:
-    :return:
-    """
-    for book in BOOKS.values():
-        name = book['name']
-        if name.lower() == book_name.lower():
-            abort(409, message="Book with the name already exists - {}".format(book_name))
-
-
-def abort_if_same_book_already_borrowed(user_id, book_id):
-    """
-    Abort when a user has already borrowed the same book
-    """
-    for borrow in BORROWS.values():
-        if borrow['user_id'] == user_id and borrow['book_id'] == book_id:
-            if borrow['is_active'] is True:
-                abort(409, message="You already have the book borrowed")
-    return None
-
-
-def get_active_borrow(user_id, book_id):
-    """Finds a Borrow that is active
-
-    :param user_id:
-        id of user borrowing the book
-    :param book_id:
-        id of book being borrowed
-    """
-
-    for borrow in BORROWS.values():
-        if borrow['user_id'] == user_id and borrow['book_id'] == book_id:
-            if borrow['is_active'] is True:
-                return borrow
-    return None
 
 
 class User(object):

@@ -1,6 +1,6 @@
 """Defines methods that manipulate borrow data.
 
-This methods de-couples the Resources and the Book model.
+This methods de-couples the Resources and the borrow model.
 """
 from flask_restful import abort
 

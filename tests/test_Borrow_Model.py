@@ -2,6 +2,7 @@
 
 Operations include: initialisation, borrow_book, return_book
 """
+from unittest import main
 import json
 
 from tests import TestBase
@@ -192,3 +193,7 @@ class BorrowModelCase(TestBase):
         respone = self.client.put('/api/v1/users/books/book2', content_type='application/json')
 
         self.assert403(respone)
+
+
+if __name__ == '__main__':
+    main(verbosity=2)

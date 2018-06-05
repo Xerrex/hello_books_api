@@ -27,7 +27,7 @@ All the endpoints take a `'application/json'` content type header
     ```
     
 * `POST:    /api/v1/users/books` to borrow a book
-* `POST:    /api/v1/uers/books/<bookId>` to return a book
+* `POST:    /api/v1/users/books/<bookId>` to return a book
 
 
 ## Technologies used

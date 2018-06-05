@@ -1,6 +1,7 @@
 """
 Test  CRUD operation on that book model
 """
+from unittest import main
 import json
 
 from tests import TestBase
@@ -205,3 +206,7 @@ class BookModelCase(TestBase):
 
         response = self.client.delete('/api/v1/books/100000', content_type='application/json')
         self.assert404(response)
+
+
+if __name__ == '__main__':
+    main(verbosity=2)

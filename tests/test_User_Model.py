@@ -258,21 +258,23 @@ class UserModelCase(TestBase):
         new_user_email = {
             'email': "alex@dev.com16"
         }
-        response = self.client.post('/api/v1/auth/reset-password', data=json.dumps(new_user_email),
+        response = self.client.post('/api/v1/auth/reset-password-request', data=json.dumps(new_user_email),
                                     content_type='application/json')
 
         # get the reset token
         response_data = json.loads(response.get_data(as_text=True))
-        reset_token = response_data['reset_token']
+        reset_link = response_data['reset_link']
 
         # make reset with token
         password_reset_request = {
             'email': "alex@dev.com16",
-            'reset_token': reset_token,
             'new_password': '0987654321'
         }
 
-        response = self.client.post('/api/v1/auth/reset-password', data=json.dumps(password_reset_request),
+        # response = self.client.post('/api/v1/auth/reset-password', data=json.dumps(password_reset_request),
+        #                             content_type='application/json')
+
+        response = self.client.put(reset_link, data=json.dumps(password_reset_request),
                                     content_type='application/json')
 
         # get new user reset password
@@ -299,53 +301,8 @@ class UserModelCase(TestBase):
         }
         response = self.client.post('/api/v1/auth/reset-password', data=json.dumps(new_user_email),
                                     content_type='application/json')
-        # get response message
-        response_data = json.loads(response.get_data(as_text=True))
-        response_msg = response_data['message']
-        expected_msg = "Your email was Not found. Please register first to reset password"
 
         self.assert404(response)
-        self.assertIn(expected_msg,response_msg)
-
-    def test_new_password_is_required_to_reset_password(self):
-        """Test that the new_password is required
-
-        Confirm  that a valid post request /api/v1/auth/reset-password
-        to new_password.
-        """
-        new_user = {
-            "name": "Alex167",
-            "email": "alex@dev.com167",
-            "password": "123456789167",
-            "aboutme": "mad skills you167"
-        }
-
-        # register user
-        response = self.client.post('/api/v1/auth/register', data=json.dumps(new_user),
-                                    content_type='application/json')
-
-        # request password reset token
-        new_user_email = {
-            'email': "alex@dev.com167"
-        }
-
-        response = self.client.post('/api/v1/auth/reset-password', data=json.dumps(new_user_email),
-                                    content_type='application/json')
-
-        # get the reset token
-        response_data = json.loads(response.get_data(as_text=True))
-        reset_token = response_data['reset_token']
-
-        # make reset with token
-        password_reset_request = {
-            'email': "alex@dev.com16",
-            'reset_token': reset_token,
-        }
-
-        response = self.client.post('/api/v1/auth/reset-password', data=json.dumps(password_reset_request),
-                                    content_type='application/json')
-
-        self.assert400(response)
 
 
 if __name__ == '__main__':

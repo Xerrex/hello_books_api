@@ -42,3 +42,13 @@ def get_user_by_id(user_id):
 
     return USERS[user_id]
 
+
+def password_reset_token(email):
+    """Generate user Token"""
+    token = User.generate_token_value(email)
+    return token
+
+
+def verify_token(token):
+    """Check User token"""
+    return User.verify_token_value(token)

@@ -1,9 +1,9 @@
 from flask import session
 from flask_restful import Resource, reqparse
 
-from app.models import BORROWS, abort_if_same_book_already_borrowed, get_active_borrow
-from app.models import Borrow
-from app.models import abort_if_book_does_not_exist
+from app.data_repo.book_repo import abort_if_book_not_found
+from app.data_repo.borrow_repo import abort_if_book_is_borrowed, borrow_book, return_book
+
 from app.utils.data_validators import string_validator
 
 
@@ -21,17 +21,14 @@ class BorrowResource(Resource):
 
         book_args = self.book_parser.parse_args()
         book_id = book_args['book_id']
-        abort_if_book_does_not_exist(book_id)
+        abort_if_book_not_found(book_id)
 
         user_id = session['userID']
-        abort_if_same_book_already_borrowed(user_id, book_id)
+        abort_if_book_is_borrowed(user_id, book_id)
 
-        borrow_id = len(BORROWS) + 1
 
-        borrow_id = 'borrow%i' % borrow_id
-        new_borrow = Borrow(user_id, book_id)
+        borrow_book(user_id, book_id)
 
-        BORROWS[borrow_id] = new_borrow.__dict__
         response = {
             "message": "You have successfully Borrowed the book"
         }
@@ -48,15 +45,10 @@ class ReturnResource(Resource):
 
         user_id = session['userID']
 
-        # check if book is borrowed
-        response = get_active_borrow(user_id, book_id)
-
-        if response is not None:
-            # return the book
-            borrow = get_active_borrow(user_id, book_id)
-            borrow['is_active'] = False
+        if return_book(user_id, book_id):
             response = {"message":"Book has been successfully returned"}
             return response, 200
+
         # book needs to be borrowed first
         response = {"message": "You Need to borrow the book first"}
         return response, 403

@@ -19,13 +19,8 @@ All the endpoints take a `'application/json'` content type header
 * `POST:    /api/v1/auth/register` to register a new user.
 * `POST:    /api/v1/auth/login` to login a user
 * `POST:    /api/v1/auth/logout` to logout user
-* `POST:    /api/v1/auth/reset-password` to reset password:
-    ```
-     Done in two steps
-      1. Pass only an `email` to get `reset_token`
-      2. with `email, reset_token, new_password` to reset password
-    ```
-    
+* `POST:    /api/v1/auth//reset-password-request` to request password reset link
+* `PUT:    /api/v1/auth/reset-password` to reset password:
 * `POST:    /api/v1/users/books` to borrow a book
 * `POST:    /api/v1/users/books/<bookId>` to return a book
 

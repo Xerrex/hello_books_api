@@ -58,18 +58,16 @@ class User(db.Model):
         """
         return 'User-{}-{}-{}'.format(self.name, self.email, self.last_seen)
 
-    @staticmethod
-    def generate_token_value(user_email):
+    def generate_token_value(self):
         """Generate JSON WEB TOKEN based on the user's email
 
-        :param user_email:
         :return jwt_token:
         """
-        user_email = user_email.lstrip('@')
+
         secret = os.environ.get('SECRET_KEY') or 'prepare to be amazed'
 
         payload = {
-            'reset_password_email': user_email,
+            'reset_password': self.id,
             'exp': datetime.utcnow() + timedelta(minutes=5),
             'iat': datetime.utcnow()
         }
@@ -88,12 +86,13 @@ class User(db.Model):
         secret = os.environ.get('SECRET_KEY') or 'prepare to be amazed'
         try:
             payload = jwt.decode(token, secret, algorithms=['HS256'])
-            email = payload['reset_password_email']
-            return email
+            id = payload['reset_password']
+
         except jwt.ExpiredSignatureError:
             return None
         except jwt.InvalidTokenError:
             return None
+        return User.query.get(id)
 
 
 class Section(db.Model):

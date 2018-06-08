@@ -3,7 +3,7 @@ from _datetime import datetime, timedelta
 import jwt
 
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from app import db
 
 USERS = {}  # stores User models
 
@@ -12,25 +12,39 @@ BOOKS = {}  # stores Book models
 BORROWS = {}  # stores Borrow models
 
 
-class User(object):
+class User(db.Model):
     """class defines User data model
 
-    name, email, password, aboutme, lastseen
+    name, email, password, about_me, last_seen, is_admin
     """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(256), unique=True, nullable=False)
+    password = db.Column(db.String(256), nullable=False)
+    about_me = db.Column(db.String(200))
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+    is_admin = db.Column(db.Boolean, default=False)
 
-    def __init__(self, name=None, email=None, password=None, aboutme=None):
+    def __init__(self, name, email, password, about_me):
         """Initialise a new instance of User class
 
          :param name:
          :param email:
          :param password:
-         :param aboutme:
+         :param about_me:
          """
         self.name = name
         self.email = email  # Email should be unique
         self.password = generate_password_hash(password)
-        self.aboume = aboutme
-        self.lastseen = datetime.utcnow()
+        self.about_me = about_me
+        self.last_seen = datetime.utcnow()
+
+    def save(self):
+        """Save a user to the database.
+        This includes creating a new user and editing one.
+        """
+        db.session.add(self)
+        db.session.commit()
 
     def verify_password(self, password):
         """
@@ -82,11 +96,18 @@ class User(object):
             return None
 
 
-class Book(object):
+class Book(db.Model):
     """This defines the Book data model
 
     name, description, section, quantity
     """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=True, nullable=False)
+    description = db.Column(db.String(256), nullable=False)
+    section = db.Column(db.Integer, db.ForeignKey('section.id'),
+                        nullable=False)
+    quantity = db.Column(db.Integer, default=1)
+
     def __init__(self, name, description, section, quantity):
         """creates a new Book instance
 
@@ -98,7 +119,14 @@ class Book(object):
         self.name = name
         self.description = description
         self.section = section
-        self.quantity = int(quantity)
+        self.quantity = quantity
+
+    def save(self):
+        """Save a book to the database.
+        This includes creating a new book and editing one.
+        """
+        db.session.add(self)
+        db.session.commit()
 
     def __repr__(self):
         """
@@ -108,12 +136,19 @@ class Book(object):
         return 'Book:{}-{}'.format(self.name, self.quantity)
 
 
-class Borrow(object):
+class Borrow(db.Model):
     """Borrow model
 
     This class defines the borrowing of a book by a user
     user_id, book_id, borrowed_at, due_at, is_returned
     """
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    book_id = db.Column(db.Integer, nullable=False)
+    borrowed_at = db.Column(db.DateTime, default=datetime.utcnow)
+    due_at = db.Column(db.DateTime, nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+
     def __init__(self,user_id, book_id):
         self.user_id = user_id
         self.book_id = book_id
@@ -121,9 +156,45 @@ class Borrow(object):
         self.due_at = datetime.utcnow() + timedelta(days=3)
         self.is_active = True
 
+    def save(self):
+        """Save a Borrow to the database.
+        This includes borrowing a book and returning one.
+        """
+        db.session.add(self)
+        db.session.commit()
+
     def __repr__(self):
         """Define how Borrow is represented
         """
         return 'borrowed-{}-{}-{}'.format(self.book_id,
                                           self.borrowed_at,
                                           self.is_active)
+
+
+class Section(db.Model):
+    """This Defines the Section Data model
+
+    id, name
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=True, nullable=False)
+    books = db.relationship('Book', backref='section', lazy=True)
+
+    def __init__(self, name):
+        """Creates a new Section Instance
+
+        :param name
+        """
+        self.name = name
+
+    def save(self):
+        """Save a section to the database.
+        This includes creating a new cook section and editing one.
+        """
+        db.session.add(self)
+        db.session.commit()
+
+    def __repr__(self):
+        """Define how the Section is represented"""
+
+        return 'section-{}'.format(self.name)

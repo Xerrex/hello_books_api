@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 # local imports
 from config import app_env_configs
@@ -12,6 +13,7 @@ def create_app(config_env_name):
     app.config.from_object(app_env_configs[config_env_name])
 
     db.init_app(app)
+    Migrate(app, db)
 
     from .auth import auth_Bp as auth_Blueprint
     app.register_blueprint(auth_Blueprint)

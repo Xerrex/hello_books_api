@@ -9,13 +9,16 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'prepare to be amazed'
 
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 
 class Development_env(Config):
     """
     Development enviroment configurations
     """
     DEBUG = True
-
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL_TEST')
 
 class Testing_env(Config):
     """

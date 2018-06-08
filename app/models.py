@@ -56,7 +56,7 @@ class User(db.Model):
         """
         Defines how to print the User model
         """
-        return 'User-{}-{}-{}'.format(self.name, self.email, self.lastseen)
+        return 'User-{}-{}-{}'.format(self.name, self.email, self.last_seen)
 
     @staticmethod
     def generate_token_value(user_email):
@@ -96,6 +96,35 @@ class User(db.Model):
             return None
 
 
+class Section(db.Model):
+    """This Defines the Section Data model
+
+    id, name
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=True, nullable=False)
+    books = db.relationship('Book', backref='section', lazy=True)
+
+    def __init__(self, name):
+        """Creates a new Section Instance
+
+        :param name
+        """
+        self.name = name
+
+    def save(self):
+        """Save a section to the database.
+        This includes creating a new cook section and editing one.
+        """
+        db.session.add(self)
+        db.session.commit()
+
+    def __repr__(self):
+        """Define how the Section is represented"""
+
+        return 'section-{}'.format(self.name)
+
+
 class Book(db.Model):
     """This defines the Book data model
 
@@ -104,7 +133,7 @@ class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=True, nullable=False)
     description = db.Column(db.String(256), nullable=False)
-    section = db.Column(db.Integer, db.ForeignKey('section.id'),
+    section_id = db.Column(db.Integer, db.ForeignKey('section.id'),
                         nullable=False)
     quantity = db.Column(db.Integer, default=1)
 
@@ -118,7 +147,7 @@ class Book(db.Model):
         """
         self.name = name
         self.description = description
-        self.section = section
+        self.section_id = section
         self.quantity = quantity
 
     def save(self):
@@ -171,30 +200,4 @@ class Borrow(db.Model):
                                           self.is_active)
 
 
-class Section(db.Model):
-    """This Defines the Section Data model
 
-    id, name
-    """
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True, nullable=False)
-    books = db.relationship('Book', backref='section', lazy=True)
-
-    def __init__(self, name):
-        """Creates a new Section Instance
-
-        :param name
-        """
-        self.name = name
-
-    def save(self):
-        """Save a section to the database.
-        This includes creating a new cook section and editing one.
-        """
-        db.session.add(self)
-        db.session.commit()
-
-    def __repr__(self):
-        """Define how the Section is represented"""
-
-        return 'section-{}'.format(self.name)

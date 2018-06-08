@@ -5,14 +5,12 @@ This methods decouple the views and the models.
 from app.models import USERS, User
 
 
-def create_user(name, email, password, aboutme):
+def create_user(name, email, password, about_me):
     """ Create a new User
     """
-    new_user = User(name, email, password, aboutme)
+    new_user = User(name, email, password, about_me)
 
-    user_id = len(USERS) + 1
-    user_id = 'user%i' % user_id
-    USERS[user_id] = new_user.__dict__
+    new_user.save()
 
     return new_user
 
@@ -20,9 +18,10 @@ def create_user(name, email, password, aboutme):
 def get_user_by_email(email):
     """ Retrieve a User by email"""
 
-    for user in USERS.values():
-        if user['email'] == email:
-            return user
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        return user
     return None
 
 
@@ -40,13 +39,7 @@ def get_user_id(email):
 
 def get_user_by_id(user_id):
 
-    return USERS[user_id]
-
-
-def password_reset_token(email):
-    """Generate user Token"""
-    token = User.generate_token_value(email)
-    return token
+    return User.query.get(user_id)
 
 
 def verify_token(token):

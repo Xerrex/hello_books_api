@@ -109,7 +109,7 @@ class Section(db.Model):
 
         :param name
         """
-        self.name = name
+        self.name = name.lower()
 
     def save(self):
         """Save a section to the database.
@@ -121,7 +121,7 @@ class Section(db.Model):
     def __repr__(self):
         """Define how the Section is represented"""
 
-        return 'section-{}'.format(self.name)
+        return '{}-Book Section'.format(self.name)
 
 
 class Book(db.Model):
@@ -144,7 +144,7 @@ class Book(db.Model):
         :param section:
         :param quantity:
         """
-        self.name = name
+        self.name = name.lower()
         self.description = description
         self.section_id = section
         self.quantity = quantity

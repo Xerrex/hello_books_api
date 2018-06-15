@@ -13,39 +13,42 @@ class BookResource(Resource):
 
     def __init__(self):
 
-        self.book_parser = reqparse.RequestParser()
+        self.book_update_parser = reqparse.RequestParser()
 
-        self.book_parser.add_argument('name', type=string_validator, required=True,
+        self.book_update_parser.add_argument('name', type=string_validator, required=True,
                                       location='json')
 
-        self.book_parser.add_argument('description', type=string_validator, required=True,
+        self.book_update_parser.add_argument('description', type=string_validator, required=True,
                                       location='json')
 
-        self.book_parser.add_argument('section', type=string_validator, required=True,
-                                      location='json')
+        self.book_update_parser.add_argument('section', type=int, required=True,
+                                             help="Book Section is a Number & cannot ne blank",
+                                             location='json')
 
-        self.book_parser.add_argument('quantity', type=int, required=True,
-                                      help='Book quantity is a Number cannot be blank ',
-                                      location='json')
-
-    def put(self, bookId):
-        abort_if_book_not_found(bookId)
-        book_args = self.book_parser.parse_args()
-
-        book_name = book_args['name']
-        book_desc = book_args['description']
-        book_section = book_args['section']
-        book_qty = book_args['quantity']
-
-        book = update_book(bookId, name=book_name, description=book_desc,
-                                  section=book_section, quantity=book_qty)
-
-        response = {'message': "Book:%s was updated" % bookId, 'data': book}
-        return response, 200
+        self.book_update_parser.add_argument('quantity', type=int, required=True,
+                                             help='Book quantity is a Number & cannot be blank ',
+                                             location='json')
 
     def get(self, bookId):
         abort_if_book_not_found(bookId)
-        return get_book_by_id(bookId)
+        return get_book_by_id(bookId).__dict__, 200
+
+    def put(self, bookId):
+        abort_if_book_not_found(bookId)
+        book_args = self.book_update_parser.parse_args()
+
+        name = book_args['name']
+        description = book_args['description']
+        section = book_args['section']
+        quantity = book_args['quantity']
+
+        book = update_book(bookId, name=name, description=description,
+                                  section=section, quantity=quantity)
+
+        return {
+                   'message': "Book:%s was updated" % bookId,
+                   'book': book.__dict__
+               }, 200
 
     def delete(self, bookId):
         abort_if_book_not_found(bookId)
@@ -71,26 +74,36 @@ class BooksResource(Resource):
         self.book_parser.add_argument('description', type=string_validator, required=True,
                                       location='json')
 
-        self.book_parser.add_argument('section', type=string_validator, required=True,
-                                      location='json')
+        self.book_parser.add_argument('section', type=int, required=True, 
+                                        help="Book Section is a Number & cannot ne blank", 
+                                        location='json')
 
         self.book_parser.add_argument('quantity', type=int, required=True,
                                       help='Book quantity is a Number cannot be blank ',
                                       location='json')
 
     def get(self):
-        return get_all_books()
+        books = get_all_books()
+
+        book_list = {}
+        for book in books:
+            book_list[book.id] = book.__repr__()
+
+        return book_list, 200
 
     def post(self):
         book_args = self.book_parser.parse_args()
 
-        book_name = book_args['name']
-        book_desc = book_args['description']
-        book_section = book_args['section']
-        book_qty = book_args['quantity']
+        name = book_args['name']
+        description = book_args['description']
+        section = book_args['section']
+        quantity = book_args['quantity']
 
-        abort_if_book_exists(book_name)
+        abort_if_book_exists(name)
 
-        new_book = create_book(book_name, book_desc, book_section, book_qty)
+        book = create_book(name, description, section, quantity)
 
-        return new_book.__dict__, 201
+        return {
+                   "message": 'Book Created- {}'.format(book.name),
+                   "book": book.__dict__
+               }, 201

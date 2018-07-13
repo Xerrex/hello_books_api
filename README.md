@@ -1,6 +1,7 @@
 # [Hello_books_api](https://hello-books-api-xerrex.herokuapp.com/)
 
-![license](https://img.shields.io/github/license/mashape/apistatus.svg) [![Build Status](https://travis-ci.org/Xerrex/hello_books_api.svg?branch=master)](https://travis-ci.org/Xerrex/hello_books_api) [![Coverage Status](https://coveralls.io/repos/github/Xerrex/hello_books_api/badge.svg?branch=master)](https://coveralls.io/github/Xerrex/hello_books_api?branch=master) [![Maintainability](https://api.codeclimate.com/v1/badges/f198d0ee5be9bc93d9d9/maintainability)](https://codeclimate.com/github/Xerrex/hello_books_api/maintainability)
+![license](https://img.shields.io/github/license/mashape/apistatus.svg) 
+[![Build Status](https://travis-ci.org/Xerrex/hello_books_api.svg?branch=master)](https://travis-ci.org/Xerrex/hello_books_api) [![Coverage Status](https://coveralls.io/repos/github/Xerrex/hello_books_api/badge.svg?branch=master)](https://coveralls.io/github/Xerrex/hello_books_api?branch=master) [![Maintainability](https://api.codeclimate.com/v1/badges/f198d0ee5be9bc93d9d9/maintainability)](https://codeclimate.com/github/Xerrex/hello_books_api/maintainability)
 
 
 

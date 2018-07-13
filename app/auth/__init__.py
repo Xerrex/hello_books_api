@@ -14,7 +14,7 @@ api.add_resource(LoginResource, '/login', endpoint="login")
 
 api.add_resource(LogoutResource, '/logout', endpoint='logout')
 
-api.add_resource(ResetPassRequestResource, '/reset-password-request',
+api.add_resource(ResetPassRequestResource, '/reset-password/request',
                  endpoint='reset-request')
 
 api.add_resource(ResetPasswordResource, '/reset-password/<token>',

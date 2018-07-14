@@ -61,9 +61,6 @@ def abort_if_book_not_found(book_id):
     :param book_id:
     :return:
     """
-    if type(book_id) is not int:
-        abort(404, message="Book:{} doesn't exist".format(book_id))
-
     if not Book.query.get(book_id):
         abort(404, message="Book:{} doesn't exist".format(book_id))
 

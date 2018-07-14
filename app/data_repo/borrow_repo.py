@@ -4,18 +4,15 @@ This methods de-couples the Resources and the borrow model.
 """
 from flask_restful import abort
 
-from app.models import BORROWS, Borrow
+from app.models import Borrow
 
 
 def borrow_book(user_id, book_id):
     """ Borrow a book
     """
-    borrow_id = len(BORROWS) + 1
 
-    borrow_id = 'borrow%i' % borrow_id
-    new_borrow = Borrow(user_id, book_id)
-
-    BORROWS[borrow_id] = new_borrow.__dict__
+    borrow = Borrow(user_id, book_id)
+    borrow.save()
 
 
 def return_book(user_id, book_id):
@@ -26,20 +23,22 @@ def return_book(user_id, book_id):
     :param book_id:
         id of book being borrowed
     """
-    for borrow in BORROWS.values():
-        if borrow['user_id'] == user_id and borrow['book_id'] == book_id:
-            if borrow['is_active'] is True:
-                borrow['is_active'] = False
-                # return borrow
-                return True
-    return None
+
+    borrow = Borrow.query.filter_by(user_id=user_id, book_id=book_id, is_active=True).first()
+    borrow.is_active = False
+    borrow.save()
 
 
-def abort_if_book_is_borrowed(user_id, book_id):
+def abort_book_is_borrowed(user_id, book_id):
     """
     Abort when a user has already borrowed the same book
     """
-    for borrow in BORROWS.values():
-        if borrow['user_id'] == user_id and borrow['book_id'] == book_id:
-            if borrow['is_active'] is True:
-                abort(409, message="You already have the book borrowed")
+
+    if Borrow.query.filter_by(user_id=user_id, book_id=book_id, is_active=True).first():
+        abort(409, message="You already have the book borrowed")
+
+
+def abort_book_is_not_borrowed(user_id, book_id):
+    """ Abort when abook is not borrowed"""
+    if not Borrow.query.filter_by(user_id=user_id, book_id=book_id, is_active=True).first():
+        abort(403, message="You Need to borrow the book first")

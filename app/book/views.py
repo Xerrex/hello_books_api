@@ -1,9 +1,28 @@
-from flask_restful import Resource, reqparse
+from flask import session
+from flask_restful import Resource, reqparse, abort
 
 from app.data_repo.book_repo import get_all_books, create_book, abort_if_book_exists, \
     get_book_by_id, abort_if_book_not_found, update_book, delete_book
 
+from app.data_repo.user_repo import get_user_by_id
+
 from app.utils.data_validators import string_validator
+
+
+def check_active_session():
+    if 'userID' not in session:
+        msg = "Kindly Login first: Forbidden Action"
+        link = "/api/v1/auth/login"
+        abort(401, message=msg, login_link=link)
+
+
+def check_if_admin(action):
+    """Check that current logged in user is an admin"""
+    user = get_user_by_id(session['userID'])
+    if user.is_admin:
+        return
+    msg = f"Your not authorised to {action}"
+    abort(401, message=msg)
 
 
 class BookResource(Resource):
@@ -30,10 +49,15 @@ class BookResource(Resource):
                                              location='json')
 
     def get(self, bookId):
+        check_active_session()
         abort_if_book_not_found(bookId)
         return get_book_by_id(bookId).__dict__, 200
 
     def put(self, bookId):
+        check_active_session()
+
+        check_if_admin("update a book")
+
         abort_if_book_not_found(bookId)
         book_args = self.book_update_parser.parse_args()
 
@@ -51,6 +75,9 @@ class BookResource(Resource):
                }, 200
 
     def delete(self, bookId):
+        check_active_session()
+        check_if_admin("delete a book")
+
         abort_if_book_not_found(bookId)
         delete_book(bookId)
 
@@ -83,6 +110,7 @@ class BooksResource(Resource):
                                       location='json')
 
     def get(self):
+        check_active_session()
         books = get_all_books()
 
         book_list = {}
@@ -92,6 +120,8 @@ class BooksResource(Resource):
         return book_list, 200
 
     def post(self):
+        check_active_session()
+        check_if_admin("create a book")
         book_args = self.book_parser.parse_args()
 
         name = book_args['name']

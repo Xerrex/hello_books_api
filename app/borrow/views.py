@@ -2,7 +2,8 @@ from flask import session
 from flask_restful import Resource, reqparse
 
 from app.data_repo.book_repo import abort_if_book_not_found
-from app.data_repo.borrow_repo import abort_if_book_is_borrowed, borrow_book, return_book
+from app.data_repo.borrow_repo import abort_book_is_borrowed, borrow_book, \
+    return_book, abort_book_is_not_borrowed
 
 from app.utils.data_validators import string_validator
 
@@ -12,7 +13,7 @@ class BorrowResource(Resource):
     book_parser = reqparse.RequestParser()
 
     book_parser.add_argument('book_id', type=string_validator, required=True,
-                                  location='json')
+                             location='json')
 
     def post(self):
         # check if user is logged in first
@@ -24,8 +25,7 @@ class BorrowResource(Resource):
         abort_if_book_not_found(book_id)
 
         user_id = session['userID']
-        abort_if_book_is_borrowed(user_id, book_id)
-
+        abort_book_is_borrowed(user_id, book_id)
 
         borrow_book(user_id, book_id)
 
@@ -44,11 +44,9 @@ class ReturnResource(Resource):
             return {"message": "Kindly Login first: Forbidden Action"}, 401
 
         user_id = session['userID']
+        abort_book_is_not_borrowed(user_id, book_id)
 
-        if return_book(user_id, book_id):
-            response = {"message":"Book has been successfully returned"}
-            return response, 200
-
-        # book needs to be borrowed first
-        response = {"message": "You Need to borrow the book first"}
-        return response, 403
+        return_book(user_id, book_id)
+        
+        response = {"message": "Book has been successfully returned"}
+        return response, 200

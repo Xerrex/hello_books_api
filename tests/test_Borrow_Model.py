@@ -5,51 +5,63 @@ Operations include: initialisation, borrow_book, return_book
 from unittest import main
 import json
 
-from tests import TestBase
+from app import create_app, db
 from app.models import Borrow
-from app.models import USERS, BOOKS
+from app.data_repo.user_repo import get_user_by_email
+from .my_testbase import TestBase
 
 
 class BorrowModelCase(TestBase):
 
-    def setup_things(self):
-        """
-        Creates a new User and log's them in
-        """
-        new_user = {
-            "name": "Alex33",
-            "email": "alex@dev.com33",
-            "password": "12345678933",
-            "aboutme": "mad skills you33"
-        }
+    def setUp(self):
+        self.app = create_app("testing")
+        self.client = self.app.test_client()
 
-        # register user
-        self.client.post('/api/v1/auth/register', data=json.dumps(new_user),
-                         content_type='application/json')
-        # log in
-        login_credentials = {
-            "email": "alex@dev.com33",
-            "password": "12345678933"
-        }
+        with self.app.test_request_context():
+            db.create_all()
 
-        self.client.post('/api/v1/auth/login', data=json.dumps(login_credentials),
-                                    content_type='application/json')
+            test_user = {
+                "name": "Milka Borrows",
+                "email": "milkaborrows@dev.com",
+                "password": "milkyway12345",
+                "about_me": "Welcome to the Milky way"
+            }
+            self.client.post('/api/v1/auth/register', data=json.dumps(test_user),
+                             content_type='application/json')
 
-    def reset_things(self):
+            test_login = {
+                "email": "milkaborrows@dev.com",
+                "password": "milkyway12345"
+            }
+            user = get_user_by_email("milkaborrows@dev.com")
+            user.is_admin = True
+            user.save()
 
-        # get user id
-        loggedIn_userid = len(USERS)
-        loggedIn_userid = "user{}".format(loggedIn_userid)
+            self.client.post('/api/v1/auth/login', data=json.dumps(test_login),
+                             content_type='application/json')
 
-        loggedIn_userid = {
-            'userID': loggedIn_userid
-        }
+            self.client.post('/api/v1/sections', data=json.dumps({"name": "tests"}),
+                             content_type='application/json')
 
-        response = self.client.post('/api/v1/auth/logout', data=json.dumps(loggedIn_userid),
-                                    content_type='application/json')
+            book_data = {
+                "name": 'chenco the dev',
+                "description": 'The struggles of getting mad skills',
+                "section": "1",
+                "quantity": "4"
+            }
+            self.client.post('/api/v1/books', data=json.dumps(book_data),
+                             content_type='application/json')
+
+    def tearDown(self):
+        self.client.post('/api/v1/auth/logout', content_type='application/json')
+        with self.app.test_request_context():
+            db.drop_all()
+            self.client = None
+            self.app = None
+
 
     def test_borrow_book_initialisation(self):
-        """Test that borrow model init is accurate
+        """Test that can initialise a borrow model
 
         Ensure that borrow book initialisation works.
         """
@@ -59,12 +71,14 @@ class BorrowModelCase(TestBase):
         self.assertEqual('user1',borrow_bk.user_id)
 
     def test_only_logged_in_user_can_borrow_books(self):
-        """ Test that login first to borrow book
+        """ Test that user must login to borrow book
 
         Ensure that only logged in user can borrow books.
         """
+        self.client.post('/api/v1/auth/logout', content_type='application/json')
+
         book = {
-            'book_id':'book1'
+            'book_id':'1'
         }
 
         response = self.client.post('/api/v1/users/books', data=json.dumps(book), content_type='application/json')
@@ -72,114 +86,66 @@ class BorrowModelCase(TestBase):
         self.assert401(response)
 
     def test_borrowing_books_that_do_not_exist(self):
-        """Test cannot borrow non existent book
+        """Test that user cannot borrow non existent book
 
         Ensure that a user can only borrow books that exist.
         """
-        self.setup_things()
 
         book = {
-            'book_id': 'book100'
+            'book_id': '100'
         }
 
-        response = self.client.post('/api/v1/users/books', data=json.dumps(book), content_type='application/json')
+        response = self.client.post('/api/v1/users/books', data=json.dumps(book),
+                                    content_type='application/json')
         self.assert404(response)
 
-        self.reset_things()
 
     def test_user_can_borrow_book(self):
-        """Test that a user can borrow a book
+        """Test that user can borrow a book
 
         Ensure that a valid POST request to /api/v1/users/books
         borrows book.
         """
-        self.setup_things()
-
-        # create book
-        book_data = {
-            'name': 'chenco the dev33',
-            'description': 'The struggles of getting mad skills33',
-            'section': 'biography33',
-            'quantity': 4
-        }
-
-        response = self.client.post('/api/v1/books', data=json.dumps(book_data), content_type='application/json')
-
-        # book id
-        book_id = len(BOOKS)
-        book_id = 'book%i' % book_id
 
         book = {
-            'book_id': book_id
+            'book_id': "1"
         }
 
         response = self.client.post('/api/v1/users/books', data=json.dumps(book), content_type='application/json')
 
         self.assert201(response)
 
-        self.reset_things()
-
     def test_duplicate_borrowing(self):
-        """Test that no borrowing same book twice
+        """Test that user cannot borrow same book twice
 
         Ensure that a valid POST request to /api/v1/users/books
         with the same bookId twice fails
         """
-        self.setup_things()
-
-        # create book
-        book_data = {
-            'name': 'chenco the dev333',
-            'description': 'The struggles of getting mad skills333',
-            'section': 'biography333',
-            'quantity': 43
-        }
-
-        response = self.client.post('/api/v1/books', data=json.dumps(book_data), content_type='application/json')
-
-        # book id
-        book_id = len(BOOKS)
-        book_id = 'book%i' % book_id
 
         book= {
-            'book_id': book_id
+            'book_id': "1"
         }
 
-        response = self.client.post('/api/v1/users/books', data=json.dumps(book), content_type='application/json')
+        self.client.post('/api/v1/users/books', data=json.dumps(book), content_type='application/json')
 
         response = self.client.post('/api/v1/users/books', data=json.dumps(book), content_type='application/json')
 
         self.assert409(response)
 
     def test_returning_book(self):
-        """Test that use can return a book
+        """Test that user can return a book
 
         Ensure that valid PUT request to /api/v1/users/books/<bookId>
         returns a borrowed book.
         """
-        self.setup_things()
-
-        # create book
-        book_data = {
-            'name': 'chenco the dev34',
-            'description': 'The struggles of getting mad skills34',
-            'section': 'biography34',
-            'quantity': 4
-        }
-
-        response = self.client.post('/api/v1/books', data=json.dumps(book_data), content_type='application/json')
-
-        # book id
-        book_id = len(BOOKS)
-        book_id = 'book%i' % book_id
 
         book = {
-            'book_id':book_id
+            'book_id': "1"
         }
 
-        response = self.client.post('/api/v1/users/books', data=json.dumps(book), content_type='application/json')
+        self.client.post('/api/v1/users/books', data=json.dumps(book), content_type='application/json')
 
-        response = self.client.put('/api/v1/users/books/{}'.format(book_id), content_type='application/json')
+        response = self.client.put('/api/v1/users/books/1', content_type='application/json')
         self.assert200(response)
 
     def test_returning_book_not_borrowed(self):
@@ -188,9 +154,8 @@ class BorrowModelCase(TestBase):
         Ensure that a valid PUT request to /api/v1/users/books/<bookId>
         to return a book not borrowed fails.
         """
-        self.setup_things()
 
-        respone = self.client.put('/api/v1/users/books/book2', content_type='application/json')
+        respone = self.client.put('/api/v1/users/books/1', content_type='application/json')
 
         self.assert403(respone)
 

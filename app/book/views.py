@@ -51,7 +51,13 @@ class BookResource(Resource):
     def get(self, bookId):
         check_active_session()
         abort_if_book_not_found(bookId)
-        return get_book_by_id(bookId).__dict__, 200
+        book = get_book_by_id(bookId)
+        return {
+            "name": book.name,
+            "description": book.description,
+            "section": book.section.name,
+            "quantity": book.quantity
+        }, 200
 
     def put(self, bookId):
         check_active_session()
@@ -70,9 +76,12 @@ class BookResource(Resource):
                                   section=section, quantity=quantity)
 
         return {
-                   'message': "Book:%s was updated" % bookId,
-                   'book': book.__dict__
-               }, 200
+            'message': "Book:%s was updated" % bookId,
+            'book_name': book.name,
+            'book_decription': book.description,
+            'book_section': book.section.name,
+            'book_copies': book.quantity
+        }, 200
 
     def delete(self, bookId):
         check_active_session()
@@ -101,18 +110,21 @@ class BooksResource(Resource):
         self.book_parser.add_argument('description', type=string_validator, required=True,
                                       location='json')
 
-        self.book_parser.add_argument('section', type=int, required=True, 
-                                        help="Book Section is a Number & cannot ne blank", 
-                                        location='json')
+        self.book_parser.add_argument('section', type=int, required=True,
+                                      help="Book Section is a Number & cannot be blank",
+                                      location='json')
 
         self.book_parser.add_argument('quantity', type=int, required=True,
-                                      help='Book quantity is a Number cannot be blank ',
+                                      help='Book quantity is a Number cannot be blank',
                                       location='json')
 
     def get(self):
         check_active_session()
         books = get_all_books()
-
+        if not books:
+            return {
+                "message": "There are no books at the moment"
+            }
         book_list = {}
         for book in books:
             book_list[book.id] = book.__repr__()
@@ -134,6 +146,5 @@ class BooksResource(Resource):
         book = create_book(name, description, section, quantity)
 
         return {
-                   "message": 'Book Created- {}'.format(book.name),
-                   "book": book.__dict__
-               }, 201
+            "message": 'Book Created - {}'.format(book.name)
+        }, 201

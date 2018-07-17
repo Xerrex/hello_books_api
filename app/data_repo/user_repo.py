@@ -2,7 +2,7 @@
 
 This methods decouple the views and the models.
 """
-from app.models import USERS, User
+from app.models import User
 
 
 def create_user(name, email, password, about_me):

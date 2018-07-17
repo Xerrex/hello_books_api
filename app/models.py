@@ -5,12 +5,6 @@ import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
 
-USERS = {}  # stores User models
-
-BOOKS = {}  # stores Book models
-
-BORROWS = {}  # stores Borrow models
-
 
 class User(db.Model):
     """class defines User data model
@@ -154,6 +148,11 @@ class Book(db.Model):
         This includes creating a new book and editing one.
         """
         db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        """Delete a book from the database"""
+        db.session.delete(self)
         db.session.commit()
 
     def __repr__(self):

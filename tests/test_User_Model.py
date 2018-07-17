@@ -13,7 +13,7 @@ from app.models import User
 class UserModelCase(TestBase):
 
     def setUp(self):
-        self.app = create_app(config_env_name="testing_env")
+        self.app = create_app("testing")
         self.client = self.app.test_client()
 
         with self.app.test_request_context():
@@ -34,7 +34,7 @@ class UserModelCase(TestBase):
             "name": "Alex",
             "email": "alex@dev.com",
             "password": "123456789",
-            "aboutme": "mad skills you"
+            "about_me": "mad skills you"
         }
 
         response = self.client.post('/api/v1/auth/register', data=json.dumps(new_user),

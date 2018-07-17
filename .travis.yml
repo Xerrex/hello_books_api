@@ -2,12 +2,21 @@ language: python
 python:
   - "3.6"
 
+services:
+  - postgresql
+
+before_script:
+  - psql -c 'create database hello_books_test;' -U postgres
+
 # command to install dependencies
 install:
   - pip install -r requirements.txt
 
 # command to run tests
-script: nosetests --with-coverage
+script:
+  - export DATABASE_URL_TEST="postgresql://postgres@127.0.0.1:5432/hello_books_test"
+  - export SECRET_KEY="The tales of a developer whose skills blind your eyes"
+  - nosetests --with-coverage
 
 after_success:
   - coveralls
